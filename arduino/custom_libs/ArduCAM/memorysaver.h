@@ -1,0 +1,4 @@
+#ifndef _MEMORYSAVER_
+#define _MEMORYSAVER_
+#define OV5642_MINI_5MP_PLUS
+#endif	//_MEMORYSAVER_
