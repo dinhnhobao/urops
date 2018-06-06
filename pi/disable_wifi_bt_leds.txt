@@ -1,0 +1,7 @@
+Disabled wifi and bluetooth:
+https://irulan.net/disable-wifi-and-bluetooth-on-raspberry-pi-3/
+
+Disabled LEDs: (changes made to crontab)
+@reboot sudo sh -c 'echo 0 > /sys/class/leds/led1/brightness'               
+@reboot sudo sh -c 'echo 0 > /sys/class/leds/led0/brightness'
+
