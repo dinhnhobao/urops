@@ -10,3 +10,5 @@ retrieval/__pycache__/
 .gitignore.swp
 .floydexpt
 .floyddata
+
+labelling/pictures

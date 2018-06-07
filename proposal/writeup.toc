@@ -1,8 +1,0 @@
-\contentsline {section}{\numberline {1}Introduction}{1}{section.1}
-\contentsline {section}{\numberline {2}Project Goals}{1}{section.2}
-\contentsline {subsection}{\numberline {2.1}Choice of Machine Learning Tool}{1}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}Partial Proof of Concept}{2}{subsection.2.2}
-\contentsline {section}{\numberline {3}Data Collection from NUS}{2}{section.3}
-\contentsline {subsection}{\numberline {3.1}Equipment, Location, and Frequency of Data Capture}{2}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Training the CNN, in the Cloud.}{3}{subsection.3.2}
-\contentsline {section}{\numberline {4}Conclusion and Extensions}{4}{section.4}
