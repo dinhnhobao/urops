@@ -54,8 +54,9 @@ cropped_image = rotate_image(cv2.imread("../pictures_dump/" + args["image"]),
 # Resizes the cropped image to 128 by 128.
 resized_image = cv2.resize(cropped_image, (128, 128))
 
-cv2.imwrite("../pictures_dump/cropped/"
-            + args["image"][0:(len(args["image"]) - 4)]
-            + "_" + args["label"] + ".jpg", resized_image)
-
-print("Done succesfully.")
+try:
+    cv2.imwrite("../pictures_dump/cropped/"
+                + args["image"][0:(len(args["image"]) - 4)]
+                + "_" + args["label"] + ".jpg", resized_image)
+except:
+    print("Failed.")
