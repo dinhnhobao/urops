@@ -46,7 +46,7 @@ ap.add_argument("-l", "--label", required=True, help="Spot number")
 args = vars(ap.parse_args())
 
 # Crops image of spot.
-cropped_image = rotate_image("../pictures_dump/" + cv2.imread(args["image"]),
+cropped_image = rotate_image(cv2.imread("../pictures_dump/" + args["image"]),
                              int(args["angle"]))[
                              int(args["y_one"]):int(args["y_two"]),
                              int(args["x_one"]):int(args["x_two"])]
@@ -55,5 +55,7 @@ cropped_image = rotate_image("../pictures_dump/" + cv2.imread(args["image"]),
 resized_image = cv2.resize(cropped_image, (128, 128))
 
 cv2.imwrite("../pictures_dump/cropped/"
-            + args["image"][0:len(args["path"] - 4)]
+            + args["image"][0:(len(args["image"]) - 4)]
             + "_" + args["label"] + ".jpg", resized_image)
+
+print("Done succesfully.")
