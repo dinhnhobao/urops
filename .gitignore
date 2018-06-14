@@ -11,4 +11,5 @@ retrieval/__pycache__/
 .floydexpt
 .floyddata
 
-labelling/pictures
+#labelling/pictures_dump
+labelling/scripts/nohup.out
