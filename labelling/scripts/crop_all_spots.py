@@ -14,7 +14,7 @@ def main():
     for image in pictures:
         if image != ".DS_Store":
             num_done += 1
-            for spot_number in range(54):
+            for spot_number in range(36):
                 print("python crop.py --image " + image
                       + " --angle " + str(instructions["angle"][spot_number])
                       + " --x_one " + str(instructions["x_one"][spot_number])
