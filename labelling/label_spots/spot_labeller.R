@@ -1,6 +1,6 @@
 library(imager)
 
-directory <- "../pictures_dump/"
+directory <- "label_pictures/"
 date <- readline("Enter date: ")
 time_started <- readline("Enter start time: ")
 file_names <- list.files(directory, pattern="*.jpg")
@@ -24,4 +24,4 @@ result_df <- NULL
 result_df$date_id <- all_date_ids
 result_df$label <- all_labels
 rownames(result_df) <- NULL
-write.csv(result_df, paste("../label_csvs/", date, "_", time_started, ".csv", sep=""), row.names=FALSE)
+write.csv(result_df, paste("label_csvs/", date, "_", time_started, ".csv", sep=""), row.names=FALSE)
