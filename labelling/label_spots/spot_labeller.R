@@ -1,6 +1,6 @@
 library(imager)
 
-directory <- "../dummy_spot_pictures/"
+directory <- "../pictures_dump/"
 date <- readline("Enter date: ")
 time_started <- readline("Enter start time: ")
 file_names <- list.files(directory, pattern="*.jpg")
