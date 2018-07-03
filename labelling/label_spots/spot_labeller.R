@@ -1,8 +1,8 @@
 library(imager)
 
 directory <- "label_pictures/"
-date <- "2018-06-21"
-time_started <- "1215"
+date <- "2018-06-22"
+time_started <- "0720"
 file_names <- list.files(directory, pattern="*.jpg")
 
 all_date_ids <- NULL
@@ -10,13 +10,15 @@ all_labels <- NULL
 for (index in 1:length(file_names)) {
   image <- load.image(paste(directory, file_names[index], sep=""))
   plot(image,
-       main=file_names[index])
+       main=paste(file_names[index],
+                  paste(index, "/", length(file_names), sep="")))
   all_date_ids <- c(all_date_ids,
                      substr(file_names[index],
                             start=1,
                             stop=nchar(file_names[index]) - 4)
   )
-  all_labels <- c(all_labels, readline("Enter label: "))
+  input <- readline("Enter label: ")
+  all_labels <- c(all_labels, ifelse(input == "", 0, 1))
   plot(load.image("white.png"))
 }
 
