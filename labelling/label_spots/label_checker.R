@@ -2,8 +2,8 @@ library(imager)
 library(stringr)
 
 directory <- "label_pictures/"
-date <- "2018-06-29"
-time_started <- "1537"
+date <- "2018-06-21"
+time_started <- "1215"
 file_names <- list.files(directory, pattern="*.jpg")
 labels <- read.csv(paste("label_csvs/", date, "_", time_started, ".csv", sep=""))
 par(mfrow=c(1, 2))
@@ -29,6 +29,6 @@ for (index in 1:length(file_names)) {
        y=1,
        paste(index, "/", length(file_names), sep=""),
        cex = 1.6, col = "black")
-  readline("")
+  readLine("")L
 }
 par(mfrow=c(1, 1))
