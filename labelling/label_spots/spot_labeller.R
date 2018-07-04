@@ -1,8 +1,8 @@
 library(imager)
 
 directory <- "label_pictures/"
-date <- "2018-06-15"
-time_started <- "1055"
+date <- "2018-06-14"
+time_started <- "1335"
 file_names <- list.files(directory, pattern="*.jpg")
 
 all_date_ids <- NULL
