@@ -2,12 +2,12 @@ library(imager)
 library(stringr)
 
 directory <- "label_pictures/"
-date <- "2018-06-23"
-time_started <- "1310"
+date <- "2018-07-06"
+time_started <- "1205"
 file_names <- list.files(directory, pattern="*.jpg")
 labels <- read.csv(paste("label_csvs/", date, "_", time_started, ".csv", sep=""))
 par(mfrow=c(1, 2))
-for (index in 1:length(file_names)) {
+for (index in 1870:length(file_names)) {
   image <- load.image(paste(directory, file_names[index], sep=""))
   plot(image,
        main=file_names[index])
@@ -34,10 +34,11 @@ for (index in 1:length(file_names)) {
 par(mfrow=c(1, 1))
 
 # Spot remover.
-# directory <- "label_pictures/"
-# file_names <- paste("label_pictures/",
-#                     list.files(directory, pattern="*_22.jpg"),
-#                                sep="")
-# for (index in 1:length(file_names)) {
-#   system(paste("rm", file_names[index]))
-# }
+directory <- "label_pictures/"
+file_names <- paste("label_pictures/",
+                    list.files(directory, pattern="*_5.jpg"),
+                               sep="")
+for (index in 1:length(file_names)) {
+  system(paste("rm", file_names[index]))
+}
+
