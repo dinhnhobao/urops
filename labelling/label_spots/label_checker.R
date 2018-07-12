@@ -3,9 +3,8 @@ library(stringr)
 
 directory <- "label_pictures/"
 date <- "2018-07-06"
-time_started <- "1205"
 file_names <- list.files(directory, pattern="*.jpg")
-labels <- read.csv(paste("label_csvs/", date, "_", time_started, ".csv", sep=""))
+labels <- read.csv(paste("label_csvs/", date, ".csv", sep=""))
 par(mfrow=c(1, 2))
 for (index in 1870:length(file_names)) {
   image <- load.image(paste(directory, file_names[index], sep=""))

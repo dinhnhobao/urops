@@ -2,7 +2,6 @@ library(imager)
 
 directory <- "label_pictures/"
 date <- "2018-07-06"
-time_started <- "1205"
 file_names <- list.files(directory, pattern="*.jpg")
 
 all_date_ids <- NULL
@@ -27,5 +26,5 @@ result_df$date_id <- all_date_ids
 result_df$label <- all_labels
 rownames(result_df) <- NULL
 write.csv(result_df,
-          paste("label_csvs/", date, "_", time_started, ".csv", sep=""),
+          paste("label_csvs/", date, ".csv", sep=""),
           row.names=FALSE)
