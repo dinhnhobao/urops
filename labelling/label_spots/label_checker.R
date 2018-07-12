@@ -35,7 +35,7 @@ par(mfrow=c(1, 1))
 # Spot remover.
 directory <- "label_pictures/"
 file_names <- paste("label_pictures/",
-                    list.files(directory, pattern="*_22.jpg"),
+                    list.files(directory, pattern="*_8.jpg"),
                                sep="")
 for (index in 1:length(file_names)) {
   system(paste("rm", file_names[index]))
