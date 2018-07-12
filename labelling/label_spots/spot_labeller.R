@@ -6,7 +6,7 @@ file_names <- list.files(directory, pattern="*.jpg")
 
 all_date_ids <- NULL
 all_labels <- NULL
-for (index in 1:length(file_names)) {
+for (index in 1000:length(file_names)) {
   image <- load.image(paste(directory, file_names[index], sep=""))
   plot(image,
        main=paste(file_names[index],
