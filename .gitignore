@@ -13,3 +13,4 @@ retrieval/__pycache__/
 
 #labelling/pictures_dump
 labelling/scripts/nohup.out
+labelling/*.zip
