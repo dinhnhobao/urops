@@ -36,7 +36,7 @@ par(mfrow=c(1, 1))
 
 spots_to_remove <- 9:20 
 for (i in spots_to_remove) {
-  directory <- "to_check_2/"
+  directory <- "label_pictures/"
   file_names <- paste(directory,
                       list.files(directory, pattern=paste("*_", i, ".jpg", sep="")),
                                  sep="")
