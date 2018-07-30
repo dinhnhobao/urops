@@ -8,3 +8,4 @@ for (i in spots_to_remove) {
     system(paste("rm", file_names[index]))
   }
 }
+
