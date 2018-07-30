@@ -1,4 +1,4 @@
-spots_to_remove <- 9:20
+spots_to_remove <- 22
 for (i in spots_to_remove) {
   directory <- "label_pictures/"
   file_names <- paste(directory,
