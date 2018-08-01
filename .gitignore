@@ -1,16 +1,29 @@
 # Files and folders to be ignored:
 
 data/
-.DS_Store
-retrieval/__pycache__/
-.ipynb_checkpoints/
-.floydignore
-.RDataTmp
-.Rhistory
-.gitignore.swp
-.floydexpt
-.floyddata
 
-#labelling/pictures_dump
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+
+.Rhistory
+*/.Rhistory
+*/*/.Rhistory
+*/*/*/.Rhistory
+
+.RData
+*/.RData
+*/*/.RData
+*/*/*/.RData
+
+data_prep/__pycache__/
+data_prep/.ipynb_checkpoints/
+labelling/scripts//.ipynb_checkpoints/
+models/.ipynb_checkpoints/
+
+models/.floydignore
+models/floydexpt
+
 labelling/scripts/nohup.out
-labelling/*.zip
+
