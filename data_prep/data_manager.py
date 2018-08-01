@@ -19,7 +19,7 @@ class MacOSFile():
         return getattr(self.f, item)
 
     def read(self, n):
-        Print("Reading total_bytes=%s" % n, flush=True)
+        print("Reading total_bytes=%s" % n, flush=True)
         if n >= (1 << 31):
             buffer = bytearray(n)
             idx = 0
@@ -56,3 +56,7 @@ def pickle_load(file_path):
     """Wrapper of pickle.load"""
     with open(file_path, "rb") as f:
         return pickle.load(MacOSFile(f))
+
+def find_adjusted_val_prop(desired_val_prop, test_prop, num_examples):
+    desired_val_size = desired_val_prop * num_examples
+    return desired_val_size / ((1 - test_prop) * num_examples)
