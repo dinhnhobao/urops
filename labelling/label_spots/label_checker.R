@@ -2,11 +2,11 @@ library(imager)
 library(stringr)
 
 directory <- "label_pictures/"
-date <- "2018-07-23"
+date <- "2018-07-24"
 file_names <- list.files(directory, pattern="*.jpg")
 labels <- read.csv(paste("label_csvs/", date, ".csv", sep=""))
 par(mfrow=c(1, 2))
-for (index in 500:length(file_names)) {
+for (index in 1:length(file_names)) {
   image <- load.image(paste(directory, file_names[index], sep=""))
   plot(image,
        main=file_names[index])
