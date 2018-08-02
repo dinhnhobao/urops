@@ -1,6 +1,0 @@
-To load data:
-1. Allow sufficient rights to "gdown.pl", e.g. run "chmod +x gdown.pl".
-2. Download the data: run "./gdown.pl <INSERT_ZIP_LINK_HERE> <path_to_data>",
-   where "path_to_data" is the path "cnn_*.py" loads data from.
-3. Unzip "h5.zip" in the directory where "h5.zip" was downloaded: run
-   "unzip h5.zip".
