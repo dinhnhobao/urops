@@ -3,7 +3,7 @@ import datetime
 
 import h5py
 import numpy as np
-import tensorflow as tf  # Version 1.8
+import tensorflow as tf  # Version 1.9
 
 
 # Command-line flags.
@@ -19,6 +19,9 @@ flags.DEFINE_boolean('download_data',
 flags.DEFINE_float('learning_rate',
                    0.0001,
                    'Initial learning rate.')
+flags.DEFINE_string('relu_type',
+                   'leaky',
+                   'Type of ReLU to use: "leaky", "concatenated", or "vanilla".')
 flags.DEFINE_integer('num_epochs',
                      5,
                      'Number of epochs to train for.')
@@ -26,11 +29,28 @@ flags.DEFINE_boolean('do_test',
                      False,
                      ('If true, trains on whole training set and then tests '
                       'resultant model.'))
+flags.DEFINE_integer('train_summary_freq',
+                     1,
+                     ('Number of training iterations between '
+                      'training summary-writing.'))
+flags.DEFINE_integer('eval_summary_freq',
+                     256,
+                     ('Number of evalation iterations between '
+                      'evaluation summary-writing.'))
+flags.DEFINE_boolean('save_model',
+                     True,
+                     ('If true, saves model to "model_checkpoints/{start_dt}"'
+                      'at the end of training.'))
+flags.DEFINE_string('restore_model',
+                    None,
+                    ('If not None, will restore to the model pointed to before'
+                     'training.'))
 
 # Manage data.
 if FLAGS.download_data:
-    os.system(f'mkdir data data/{dataset}')
-    os.system(f'chmod +x get_{dataset}.sh && ./get_{dataset}.sh')
+    os.system(f'mkdir data data/{FLAGS.dataset_name}')
+    os.system((f'chmod +x get_dataset_scripts/get_{FLAGS.dataset_name}.sh &&'
+               f'./get_dataset_scripts/get_{FLAGS.dataset_name}.sh'))
 
 # Set input details.
 image_size = 128
@@ -48,26 +68,6 @@ num_hidden_layers = 6
 num_filters_per_layer = [64, 128, 256, 512, 1024, 2048]
 filter_sizes = [5, 3, 3, 3, 3, 1]
 pooling_kernel_sizes = [2, 2, 2, 2, 2, 2]
-
-
-def conv2d(X, W, b, stride=1):
-    '''tf.nn.conv2d() wrapper, with bias and relu activation.'''
-    # The first and last element of 'strides' is example and
-    # channel stride respectively.
-    X = tf.nn.conv2d(X, W,
-                     strides=[1, stride, stride, 1],
-                     padding='SAME')
-    X = tf.nn.bias_add(X, b)
-    return tf.nn.relu(X)
-
-
-def max_pool(X, kernel_size=2):
-    # Stride of the kernel is always >= its size to prevent
-    # overlap of pooling region.
-    return tf.nn.max_pool(X,
-                          ksize=[1, kernel_size, kernel_size, 1],
-                          strides=[1, kernel_size, kernel_size, 1],
-                          padding='SAME')
 
 
 # Assumes stride when pooling is 1, and padding when convoluting is 'SAME'.
@@ -155,6 +155,30 @@ biases = {
 }
 
 
+def conv2d(X, W, b, stride=1):
+    '''tf.nn.conv2d() wrapper, with bias and relu activation.'''
+    # The first and last element of 'strides' is example and
+    # channel stride respectively.
+    X = tf.nn.conv2d(X, W,
+                     strides=[1, stride, stride, 1],
+                     padding='SAME')
+    if FLAGS.relu_type == 'vanilla':
+        return tf.nn.relu(tf.nn.bias_add(X, b))
+    elif FLAGS.relu_type == 'leaky':
+        return tf.nn.leaky_relu(tf.nn.bias_add(X, b))
+    elif FLAGS.relu_type == 'concatenated':
+        return tf.nn.crelu(tf.nn.bias_add(X, b))
+
+
+def max_pool(X, kernel_size=2):
+    # Stride of the kernel is always >= its size to prevent
+    # overlap of pooling region.
+    return tf.nn.max_pool(X,
+                          ksize=[1, kernel_size, kernel_size, 1],
+                          strides=[1, kernel_size, kernel_size, 1],
+                          padding='SAME')
+
+
 def conv_net(X, weights, biases):
     conv_layer_1 = conv2d(X,
                           weights['wc1'],
@@ -192,22 +216,25 @@ def conv_net(X, weights, biases):
                                              weights['wd1']),
                                    biases['bd1'])
     fully_connected_layer = tf.nn.relu(fully_connected_layer)
-    out = tf.add(tf.matmul(fully_connected_layer,
-                           weights['out']),
-                 biases['out'])
-    return out
+    return tf.add(tf.matmul(fully_connected_layer,
+                            weights['out']),
+                  biases['out'])
 
 
 predicted_labels = conv_net(X, weights, biases)
 find_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=predicted_labels,
-                                                              labels=y))
+                                                                      labels=y))
+tf.summary.scalar('Loss', find_loss)
 optimize = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(find_loss)
 
 is_correct_prediction = tf.equal(tf.argmax(predicted_labels, 1),
                                  tf.argmax(y, 1))
 find_accuracy = tf.reduce_mean(tf.cast(is_correct_prediction, tf.float32))
-
+tf.summary.scalar('Accuracy', find_accuracy)
 do_test = FLAGS.do_test
+
+merge_summary_nodes = tf.summary.merge_all()
+save_model = tf.train.Saver()
 
 base_path = f'data/{FLAGS.dataset_name}'
 start_dt = str(datetime.datetime.now())[:19].replace(" ", "_")
@@ -215,46 +242,58 @@ if not do_test:
     validation_accuracies = list()
     for curr_split_num in range(1, (num_splits + 1)):
         train_validation_set = h5py.File((f'{base_path}/train_validation_set_'
-                                          '{curr_split_num}.hdf5'),
+                                          f'{curr_split_num}.hdf5'),
                                          'r')
         train_X = train_validation_set['train_X']
         train_y = train_validation_set['train_y']
         validation_X = train_validation_set['validation_X']
         validation_y = train_validation_set['validation_y']
-        init = tf.global_variables_initializer()
         with tf.Session() as sess:
-            sess.run(init)
-            train_loss = list()
-            train_accuracy = list()
-            summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
-                                                    'validation_mode/{start_dt}'),
-                                                   sess.graph)
+            if FLAGS.restore_model is None:
+                sess.run(tf.global_variables_initializer())
+            else:
+                meta = tf.train.import_meta_graph(f'{FLAGS.restore_model}.meta')
+                meta.restore(sess, FLAGS.restore_model)
             print()
             print(f'Training on split {curr_split_num}.')
             print('-' * 58)
-            counter = 0
+            train_summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
+                                        f'validation_mode/train_{start_dt}'),
+                                       sess.graph)
+            summary_counter = 0
             for epoch in range(1, (num_epochs + 1)):
                 for batch in range(len(train_X) // batch_size):
-                    batch_X =train_X[batch * batch_size:min((batch + 1) * batch_size,
+                    batch_X = train_X[batch * batch_size:min((batch + 1) * batch_size,
                                                             len(train_X))]
                     batch_y = train_y[batch * batch_size:min((batch + 1) * batch_size,
                                                              len(train_y))]
                     # Backpropagate, then calculate batch loss and accuracy.
-                    merge = tf.summary.merge_all()
-                    summary, _, batch_loss, batch_accuracy = sess.run([merge,
-                                                                       optimize,
-                                                                       find_loss,
-                                                                       find_accuracy],
-                                                                      feed_dict={X: batch_X,
-                                                                                 y: batch_y})
-                    counter += 1
-                    summary_writer.add_summary(summary, counter)
-                    train_loss.append(batch_loss)
-                    train_accuracy.append(batch_accuracy)
+                    summary_counter += 1
+                    if summary_counter % FLAGS.train_summary_freq == 0:
+                        summary, _, batch_loss, batch_accuracy = sess.run([merge_summary_nodes,
+                                                                           optimize,
+                                                                           find_loss,
+                                                                           find_accuracy],
+                                                                          feed_dict={X: batch_X,
+                                                                                     y: batch_y})
+                        train_summary_writer.add_summary(summary, summary_counter)
+                    else:
+                        _, batch_loss, batch_accuracy = sess.run([optimize,
+                                                                  find_loss,
+                                                                  find_accuracy],
+                                                                 feed_dict={X: batch_X,
+                                                                            y: batch_y})
+                    if summary_counter % FLAGS.test_summary_freq == 0:
+                        pass
                 print((f'Epoch {epoch} | '
                        f'training loss: {batch_loss: .3f}, '
                        f'training accuracy: {batch_accuracy: .3f}.'))
             print('-' * 58)
+
+            if FLAGS.save_model:
+                save_path = save_model.save(sess,
+                                            f'model_checkpoints/{start_dt}')
+
             validation_loss = list()
             validation_accuracy = list()
             # Feeding the whole validation set (about 15000 examples) takes
@@ -279,7 +318,7 @@ if not do_test:
             print((f'Validation loss: {overall_loss: .3f}, '
                    f'validation accuracy: {overall_accuracy: .3f}.'),
                   end='\n\n')
-            summary_writer.close()
+            train_summary_writer.close()
     print(f'Validation accuracy (K = {num_splits}):')
     print(f'Mean: {np.mean(validation_accuracies): .3f}')
     print(f'Median: {np.median(validation_accuracies): .3f}')
@@ -293,15 +332,16 @@ else:
                               train_validation_set['validation_X']))
     train_y = np.concatenate((train_validation_set['train_y'],
                               train_validation_set['validation_y']))
-    init = tf.global_variables_initializer()
     with tf.Session() as sess:
-        sess.run(init)
-        train_loss = list()
-        train_accuracy = list()
-        summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
-                                                'test_mode/{start_dt}'),
+        if FLAGS.restore_model is None:
+            sess.run(tf.global_variables_initializer())
+        else:
+            meta = tf.train.import_meta_graph(f'{FLAGS.restore_model}.meta')
+            meta.restore(sess, FLAGS.restore_model)
+        train_summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
+                                                f'test_mode/{start_dt}'),
                                                sess.graph)
-        counter = 0
+        summary_counter = 0
         for epoch in range(1, (num_epochs + 1)):
             for batch in range(len(train_X) // batch_size):
                 batch_X = train_X[batch * batch_size:min((batch + 1) * batch_size,
@@ -309,20 +349,31 @@ else:
                 batch_y = train_y[batch * batch_size:min((batch + 1) * batch_size,
                                                          len(train_y))]
                 # Backpropagate, then calculate batch loss and accuracy.
-                merge = tf.summary.merge_all()
-                summary, _, batch_loss, batch_accuracy = sess.run([merge,
-                                                                   optimize,
-                                                                   find_loss,
-                                                                   find_accuracy],
-                                                                   feed_dict={X: batch_X,
-                                                                              y: batch_y})
-                counter += 1
-                summary_writer.add_summary(summary, counter)
-                train_loss.append(batch_loss)
-                train_accuracy.append(batch_accuracy)
+                summary_counter += 1
+                if summary_counter % FLAGS.train_summary_freq == 0:
+                    summary, _, batch_loss, batch_accuracy = sess.run([merge_summary_nodes,
+                                                                       optimize,
+                                                                       find_loss,
+                                                                       find_accuracy],
+                                                                      feed_dict={X: batch_X,
+                                                                                 y: batch_y})
+                    train_summary_writer.add_summary(summary, summary_counter)
+                else:
+                    _, batch_loss, batch_accuracy = sess.run([optimize,
+                                                              find_loss,
+                                                              find_accuracy],
+                                                             feed_dict={X: batch_X,
+                                                                        y: batch_y})
+                if summary_counter % FLAGS.test_summary_freq == 0:
+                    pass
             print((f'Epoch {epoch} | '
                    f'training loss: {batch_loss: .3f}, '
                    f'training accuracy: {batch_accuracy: .3f}.'))
+
+        if FLAGS.save_model:
+                save_path = save_model.save(sess,
+                                            f'model_checkpoints/{start_dt}')
+
         test_loss = list()
         test_accuracy = list()
         # Feeding the whole test set (about 5000 examples) takes more memory
@@ -345,4 +396,4 @@ else:
         overall_accuracy = np.mean(test_accuracy)
         print((f'Test loss: {overall_loss: .3f}, '
                f'test accuracy: {overall_accuracy: .3f}'))
-        summary_writer.close()
+        train_summary_writer.close()
