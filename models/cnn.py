@@ -29,14 +29,10 @@ flags.DEFINE_boolean('do_test',
                      False,
                      ('If true, trains on whole training set and then tests '
                       'resultant model.'))
-flags.DEFINE_integer('train_summary_freq',
+flags.DEFINE_integer('summary_freq',
                      1,
-                     ('Number of training iterations between '
-                      'training summary-writing.'))
-flags.DEFINE_integer('eval_summary_freq',
-                     256,
-                     ('Number of evalation iterations between '
-                      'evaluation summary-writing.'))
+                     ('Number of training iterations between training '
+                      'summary-writing.'))
 flags.DEFINE_boolean('save_model',
                      True,
                      ('If true, saves model to "model_checkpoints/{start_dt}"'
@@ -257,8 +253,8 @@ if not do_test:
             print()
             print(f'Training on split {curr_split_num}.')
             print('-' * 58)
-            train_summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
-                                        f'validation_mode/train_{start_dt}'),
+            summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
+                                        f'validation_mode/{start_dt}'),
                                        sess.graph)
             summary_counter = 0
             for epoch in range(1, (num_epochs + 1)):
@@ -269,14 +265,14 @@ if not do_test:
                                                              len(train_y))]
                     # Backpropagate, then calculate batch loss and accuracy.
                     summary_counter += 1
-                    if summary_counter % FLAGS.train_summary_freq == 0:
+                    if summary_counter % FLAGS.summary_freq == 0:
                         summary, _, batch_loss, batch_accuracy = sess.run([merge_summary_nodes,
                                                                            optimize,
                                                                            find_loss,
                                                                            find_accuracy],
                                                                           feed_dict={X: batch_X,
                                                                                      y: batch_y})
-                        train_summary_writer.add_summary(summary, summary_counter)
+                        summary_writer.add_summary(summary, summary_counter)
                     else:
                         _, batch_loss, batch_accuracy = sess.run([optimize,
                                                                   find_loss,
@@ -318,7 +314,7 @@ if not do_test:
             print((f'Validation loss: {overall_loss: .3f}, '
                    f'validation accuracy: {overall_accuracy: .3f}.'),
                   end='\n\n')
-            train_summary_writer.close()
+            summary_writer.close()
     print(f'Validation accuracy (K = {num_splits}):')
     print(f'Mean: {np.mean(validation_accuracies): .3f}')
     print(f'Median: {np.median(validation_accuracies): .3f}')
@@ -338,7 +334,7 @@ else:
         else:
             meta = tf.train.import_meta_graph(f'{FLAGS.restore_model}.meta')
             meta.restore(sess, FLAGS.restore_model)
-        train_summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
+        summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
                                                 f'test_mode/{start_dt}'),
                                                sess.graph)
         summary_counter = 0
@@ -350,22 +346,20 @@ else:
                                                          len(train_y))]
                 # Backpropagate, then calculate batch loss and accuracy.
                 summary_counter += 1
-                if summary_counter % FLAGS.train_summary_freq == 0:
+                if summary_counter % FLAGS.summary_freq == 0:
                     summary, _, batch_loss, batch_accuracy = sess.run([merge_summary_nodes,
                                                                        optimize,
                                                                        find_loss,
                                                                        find_accuracy],
                                                                       feed_dict={X: batch_X,
                                                                                  y: batch_y})
-                    train_summary_writer.add_summary(summary, summary_counter)
+                    summary_writer.add_summary(summary, summary_counter)
                 else:
                     _, batch_loss, batch_accuracy = sess.run([optimize,
                                                               find_loss,
                                                               find_accuracy],
                                                              feed_dict={X: batch_X,
                                                                         y: batch_y})
-                if summary_counter % FLAGS.test_summary_freq == 0:
-                    pass
             print((f'Epoch {epoch} | '
                    f'training loss: {batch_loss: .3f}, '
                    f'training accuracy: {batch_accuracy: .3f}.'))
@@ -396,4 +390,4 @@ else:
         overall_accuracy = np.mean(test_accuracy)
         print((f'Test loss: {overall_loss: .3f}, '
                f'test accuracy: {overall_accuracy: .3f}'))
-        train_summary_writer.close()
+        summary_writer.close()
