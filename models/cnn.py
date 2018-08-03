@@ -10,12 +10,12 @@ import tensorflow as tf  # Version 1.9
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('dataset_name',
+flags.DEFINE_string('dataset',
                     None,
                     'Name of dataset.')
 flags.DEFINE_boolean('download_data',
                      False,
-                     'If true, downloads either dataset "dataset_name".')
+                     'If true, downloads either dataset "dataset".')
 flags.DEFINE_float('learning_rate',
                    0.0001,
                    'Initial learning rate.')
@@ -44,9 +44,9 @@ flags.DEFINE_string('restore_model',
 
 # Manage data.
 if FLAGS.download_data:
-    os.system(f'mkdir data data/{FLAGS.dataset_name}')
-    os.system((f'chmod +x get_dataset_scripts/get_{FLAGS.dataset_name}.sh &&'
-               f'./get_dataset_scripts/get_{FLAGS.dataset_name}.sh'))
+    os.system(f'mkdir data data/{FLAGS.dataset}')
+    os.system((f'chmod +x get_dataset_scripts/get_{FLAGS.dataset}.sh &&'
+               f'./get_dataset_scripts/get_{FLAGS.dataset}.sh'))
 
 # Set input details.
 image_size = 128
@@ -227,14 +227,13 @@ is_correct_prediction = tf.equal(tf.argmax(predicted_labels, 1),
                                  tf.argmax(y, 1))
 find_accuracy = tf.reduce_mean(tf.cast(is_correct_prediction, tf.float32))
 tf.summary.scalar('Accuracy', find_accuracy)
-do_test = FLAGS.do_test
 
 merge_summary_nodes = tf.summary.merge_all()
 save_model = tf.train.Saver()
 
-base_path = f'data/{FLAGS.dataset_name}'
+base_path = f'data/{FLAGS.dataset}'
 start_dt = str(datetime.datetime.now())[:19].replace(" ", "_")
-if not do_test:
+if not FLAGS.do_test:
     validation_accuracies = list()
     for curr_split_num in range(1, (num_splits + 1)):
         train_validation_set = h5py.File((f'{base_path}/train_validation_set_'
@@ -248,13 +247,16 @@ if not do_test:
             if FLAGS.restore_model is None:
                 sess.run(tf.global_variables_initializer())
             else:
-                meta = tf.train.import_meta_graph(f'{FLAGS.restore_model}.meta')
-                meta.restore(sess, FLAGS.restore_model)
+                meta = tf.train.import_meta_graph(('model_checkpoints/'
+                                                  f'{FLAGS.restore_model}.meta'))
+                meta.restore(sess, ('model_checkpoints/'
+                                    f'{FLAGS.restore_model}'))
             print()
             print(f'Training on split {curr_split_num}.')
             print('-' * 58)
             summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
-                                        f'validation_mode/{start_dt}'),
+                                                    f'validation_mode/{start_dt}'
+                                                    f'_split_{curr_split_num}'),
                                        sess.graph)
             summary_counter = 0
             for epoch in range(1, (num_epochs + 1)):
@@ -279,8 +281,6 @@ if not do_test:
                                                                   find_accuracy],
                                                                  feed_dict={X: batch_X,
                                                                             y: batch_y})
-                    if summary_counter % FLAGS.test_summary_freq == 0:
-                        pass
                 print((f'Epoch {epoch} | '
                        f'training loss: {batch_loss: .3f}, '
                        f'training accuracy: {batch_accuracy: .3f}.'))
@@ -332,11 +332,16 @@ else:
         if FLAGS.restore_model is None:
             sess.run(tf.global_variables_initializer())
         else:
-            meta = tf.train.import_meta_graph(f'{FLAGS.restore_model}.meta')
-            meta.restore(sess, FLAGS.restore_model)
+            meta = tf.train.import_meta_graph(('model_checkpoints/'
+                                               f'{FLAGS.restore_model}.meta'))
+            meta.restore(sess, ('model_checkpoints/'
+                                f'{FLAGS.restore_model}'))
         summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
                                                 f'test_mode/{start_dt}'),
                                                sess.graph)
+        print()
+        print('Training on complete training set.')
+        print('-' * 58)
         summary_counter = 0
         for epoch in range(1, (num_epochs + 1)):
             for batch in range(len(train_X) // batch_size):
@@ -388,6 +393,7 @@ else:
             test_accuracy.append(batch_accuracy)
         overall_loss = np.mean(test_loss)
         overall_accuracy = np.mean(test_accuracy)
+        print()
         print((f'Test loss: {overall_loss: .3f}, '
                f'test accuracy: {overall_accuracy: .3f}'))
         summary_writer.close()
