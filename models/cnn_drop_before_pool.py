@@ -327,7 +327,8 @@ if not FLAGS.do_test:
 
             if FLAGS.save_model:
                 save_path = save_model.save(sess,
-                                            f'model_checkpoints/{start_dt}')
+                                            (f'model_checkpoints/{start_dt}'
+                                             f'_{curr_split_num}'))
 
             validation_loss = list()
             validation_accuracy = list()
@@ -414,7 +415,7 @@ else:
 
         if FLAGS.save_model:
                 save_path = save_model.save(sess,
-                                            f'model_checkpoints/{start_dt}')
+                                            f'model_checkpoints/{start_dt}_t')
 
         test_loss = list()
         test_accuracy = list()
