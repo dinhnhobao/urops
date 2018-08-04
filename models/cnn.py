@@ -243,7 +243,7 @@ if not FLAGS.do_test:
                     # Backpropagate, then calculate batch loss and accuracy.
                     summary_counter += 1
                     if summary_counter % FLAGS.summary_freq == 0:
-                        summary, _, batch_loss, batch_accuracy = sess.run([merge_summary_nodes,
+                        summary, _, batch_loss, batch_accuracy= sess.run([merge_summary_nodes,
                                                                            optimize,
                                                                            find_loss,
                                                                            find_accuracy],
@@ -252,6 +252,7 @@ if not FLAGS.do_test:
                                                                                      keep_p_conv: FLAGS.keep_p_conv,
                                                                                      keep_p_fc: FLAGS.keep_p_fc})
                         summary_writer.add_summary(summary, summary_counter)
+                        print(lala)
                     else:
                         _, batch_loss, batch_accuracy = sess.run([optimize,
                                                                   find_loss,
