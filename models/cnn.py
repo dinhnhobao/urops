@@ -55,8 +55,11 @@ flags.DEFINE_string('restore_model',
                     ('If not None, will restore to the model pointed to before'
                      'training.'))
 flags.DEFINE_boolean('write_mistakes',
-                     True,
-                     'sfasfs')
+                     False,
+                     'If True, )Remember to delete the first element from the two mistakes arrays
+as soon as the fiurst actual mistake is found.
+
+
 
 # Manage data.
 if FLAGS.download_data:
@@ -203,11 +206,40 @@ is_correct_prediction = tf.equal(tf.argmax(predicted_labels, 1),
 find_accuracy = tf.reduce_mean(tf.cast(is_correct_prediction, tf.float32))
 tf.summary.scalar('Accuracy', find_accuracy)
 
+
+def get_true_vs_predicted_label(y, predicted_labels):
+    return np.concatenate((np.argmax(y, axis=1).reshape(-1, 1),
+                           np.argmax(predicted, axis=1).reshape(-1, 1)),
+                          axis=1)
+
+
+def get_confusion_matrix(true_vs_predicted_labels):
+    confusion_matrix = np.zeros((num_classes, num_classes))
+    for i in range(true_vs_predicted_labels.shape[0]):
+        confusion_matrix[true_vs_predicted_labels[i, 0],
+                         true_vs_predicted_labels[i, 1]] += 1
+    return confusion_matrix
+
+
+def get_sensitivity(confusion_matrix):
+    tp = confusion_matrix[1, 1]
+    fn = confusion_matrix[1, 0]
+    return tp / (tp + fn)
+
+
+def get_specificity(confusion_matrix):
+    tn = confusion_matrix[0, 0]
+    fp = confusion_matrix[0, 1]
+    return tn / (tn + fp)
+
+
 merge_summary_nodes = tf.summary.merge_all()
 save_model = tf.train.Saver()
 
 base_path = f'data/{FLAGS.dataset}'
 start_dt = str(datetime.datetime.now())[:19].replace(" ", "_")
+if FLAGS.write_mistakes:
+    mistake_images = np.zeros(1, image_size, image_size, num_channels)
 if not FLAGS.do_test:
     validation_accuracies = list()
     for curr_split_num in range(1, (num_splits + 1)):
@@ -218,6 +250,7 @@ if not FLAGS.do_test:
         train_y = train_validation_set['train_y']
         validation_X = train_validation_set['validation_X']
         validation_y = train_validation_set['validation_y']
+        train_mean_sd = train_validation_set['train_mean_sd']
         with tf.Session() as sess:
             if FLAGS.restore_model is None:
                 sess.run(tf.global_variables_initializer())
@@ -273,6 +306,8 @@ if not FLAGS.do_test:
 
             validation_loss = list()
             validation_accuracy = list()
+            true_vs_predicted_labels = np.zeros((len(validation_X),
+                                                 num_classes))
             # Feeding the whole validation set (about 15000 examples) takes
             # more memory than we have (~11 GB).
             # Therefore, find 'validation_loss' and 'validation_accuracy' by
@@ -283,18 +318,26 @@ if not FLAGS.do_test:
                 batch_y = validation_y[batch: min(batch + 1,
                                                   len(validation_y))]
                 # Calculate batch loss and accuracy.
-                batch_loss, batch_accuracy = sess.run([find_loss,
-                                                       find_accuracy],
-                                                      feed_dict={X: batch_X,
-                                                                 y: batch_y})
+                batch_loss, batch_accuracy, true_vs_predicted_label = sess.run([find_loss,
+                                                                                find_accuracy,
+                                                                                get_true_vs_predicted_label],
+                                                                               feed_dict={X: batch_X,
+                                                                                          y: batch_y})
                 validation_loss.append(batch_loss)
                 validation_accuracy.append(batch_accuracy)
+                np.concatenate(true_vs_predicted_labels,
+                               true_vs_predicted_label)
             overall_loss = np.mean(validation_loss)
             overall_accuracy = np.mean(validation_accuracy)
             validation_accuracies.append(overall_accuracy)
             print((f'Validation loss: {overall_loss: .3f}, '
                    f'validation accuracy: {overall_accuracy: .3f}.'),
-                  end='\n\n')
+                  end='\n')
+            print(get_confusion_matrix(true_vs_predicted_labels))
+            if (num_classes == 2):
+                print(f'Specificity: {get_specificity(confusion_matrix): .3f}')
+                print(f'Sensitivity: {get_sensitivity(confusion_matrix): .3f}')
+            print()
             summary_writer.close()
     print(f'Validation accuracy (K = {num_splits}):')
     print(f'Mean: {np.mean(validation_accuracies): .3f}')
@@ -309,6 +352,7 @@ else:
                               train_validation_set['validation_X']))
     train_y = np.concatenate((train_validation_set['train_y'],
                               train_validation_set['validation_y']))
+    train_mean_sd = train_validation_set['train_mean_sd']
     with tf.Session() as sess:
         if FLAGS.restore_model is None:
             sess.run(tf.global_variables_initializer())
