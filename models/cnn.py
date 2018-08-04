@@ -4,7 +4,9 @@ import datetime
 import h5py
 import numpy as np
 import tensorflow as tf  # Built on version 1.9.
+import matplotlib.pyplot as plt
 
+start_dt = str(datetime.datetime.now())[:19].replace(" ", "_")
 
 # Command-line flags.
 flags = tf.app.flags
@@ -53,11 +55,10 @@ flags.DEFINE_string('restore_model',
                     None,
                     ('If not None, will restore to the model pointed to before'
                      'training.'))
-#flags.DEFINE_boolean('write_mistakes',
- #                    False,
-  #                   'If True, )Remember to delete the first element from the two mistakes arrays
-#as soon as the fiurst actual mistake is found.
-
+flags.DEFINE_boolean('write_mistakes',
+                     False,
+                     ('If True, images corresponding to misclassified examples'
+                      ' are written to disk.'))
 
 # Manage data.
 if FLAGS.download_data:
@@ -211,6 +212,15 @@ def get_true_vs_predicted_labels(true, predicted):
                           axis=1)
 
 
+def write_mistake(mistake_image, true_vs_predicted, curr_split_num, mistake_num):
+    curr_split_num = curr_split_num if curr_split_num != 0 else 't'
+    base_path = f'mistake_images/{start_dt}_{curr_split_num}'
+    os.mkdir(base_path)
+    plt.imsave((f'{base_path}/{mistake_num}_t:{true_vs_predicted[0]}_'
+                'p:{true_vs_predicted[1]}.jpg'),
+               mistake_image[..., [2, 1, 0]])
+
+
 def get_confusion_matrix(true_vs_predicted_labels):
     confusion_matrix = np.zeros((num_classes, num_classes))
     for i in range(len(true_vs_predicted_labels)):
@@ -235,9 +245,6 @@ merge_summary_nodes = tf.summary.merge_all()
 save_model = tf.train.Saver()
 
 base_path = f'data/{FLAGS.dataset}'
-start_dt = str(datetime.datetime.now())[:19].replace(" ", "_")
-#if FLAGS.write_mistakes:
-#    mistake_images = np.zeros(1, image_size, image_size, num_channels)
 if not FLAGS.do_test:
     validation_accuracies = list()
     for curr_split_num in range(1, (num_splits + 1)):
@@ -303,6 +310,8 @@ if not FLAGS.do_test:
             validation_loss = list()
             validation_accuracy = list()
             true_vs_predicted_labels = np.zeros((len(validation_X), 2))
+            if FLAGS.write_mistakes:
+                mistake_num = 0
             # Feeding the whole validation set (about 15000 examples) takes
             # more memory than we have (~11 GB).
             # Therefore, find 'validation_loss' and 'validation_accuracy' by
@@ -313,16 +322,22 @@ if not FLAGS.do_test:
                 batch_y = validation_y[batch: min(batch + 1,
                                                   len(validation_y))]
                 # Calculate batch loss and accuracy.
-                batch_loss, batch_accuracy, true, predicted = sess.run([find_loss,
-                                                                            find_accuracy,
-                                                                            y,
-                                                                            predicted_labels],
-                                                                           feed_dict={X: batch_X,
-                                                                                      y: batch_y})
+                batch_loss, batch_accuracy, predicted = sess.run([find_loss,
+                                                                  find_accuracy,
+                                                                  predicted_labels],
+                                                                 feed_dict={X: batch_X,
+                                                                            y: batch_y})
                 validation_loss.append(batch_loss)
                 validation_accuracy.append(batch_accuracy)
-                true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(true,
+                true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(batch_y,
                                                                                predicted)
+                if (true_vs_predicted_labels[batch][0] != true_vs_predicted_labels[batch][1]
+                        & FLAGS.write_mistakes):
+                    mistake_num += 1
+                    write_mistake(batch_X * train_mean_sd[1] + train_mean_sd[0],
+                                  true_vs_predicted_labels[batch],
+                                  curr_split_num,
+                                  mistake_num)
             overall_loss = np.mean(validation_loss)
             overall_accuracy = np.mean(validation_accuracy)
             print((f'Validation loss: {overall_loss: .3f}, '
@@ -404,6 +419,8 @@ else:
         test_loss = list()
         test_accuracy = list()
         true_vs_predicted_labels = np.zeros((len(train_X), 2))
+        if FLAGS.write_mistakes:
+            mistake_num = 0
         # Feeding the whole test set (about 5000 examples) takes more memory
         # than we have (~11 GB).
         # Therefore, find 'test_loss' and 'test_accuracy' by taking batches of
@@ -414,16 +431,22 @@ else:
             batch_y = test_y[batch: min(batch + 1,
                                         len(test_y))]
             # Calculate batch loss and accuracy.
-            batch_loss, batch_accuracy, true, predicted = sess.run([find_loss,
-                                                                    find_accuracy,
-                                                                    y,
-                                                                    predicted_labels],
-                                                                   feed_dict={X: batch_X,
-                                                                              y: batch_y})
+            batch_loss, batch_accuracy, predicted = sess.run([find_loss,
+                                                              find_accuracy,
+                                                              predicted_labels],
+                                                             feed_dict={X: batch_X,
+                                                                        y: batch_y})
             test_loss.append(batch_loss)
             test_accuracy.append(batch_accuracy)
-            true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(true,
+            true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(batch_y,
                                                                            predicted)
+            if (true_vs_predicted_labels[batch][0] != true_vs_predicted_labels[batch][1]
+                    & FLAGS.write_mistakes):
+                mistake_num += 1
+                write_mistake(batch_X * train_mean_sd[1] + train_mean_sd[0],
+                              true_vs_predicted_labels[batch],
+                              0,
+                              mistake_num)
         overall_loss = np.mean(test_loss)
         overall_accuracy = np.mean(test_accuracy)
         print((f'Test loss: {overall_loss: .3f}, '
