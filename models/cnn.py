@@ -11,15 +11,25 @@ import tensorflow as tf  # Built on version 1.9.
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('dataset',
-                    None,
-                    'Name of dataset.')
 flags.DEFINE_boolean('download_data',
                      False,
                      'If true, downloads either dataset "dataset".')
+flags.DEFINE_string('dataset',
+                    None,
+                    'Name of dataset.')
+flags.DEFINE_integer('num_epochs',
+                     10,
+                     'Number of epochs to train for.')
 flags.DEFINE_float('learning_rate',
                    0.0001,
                    'Initial learning rate.')
+flags.DEFINE_string('relu',
+                    'scaled',
+                    ('Type of ReLU to use: "vanilla", "scaled", "exp", "leaky"'
+                     ', "cap6", "softsign", "softplus"'))
+flags.DEFINE_string('dropout_loc',
+                    'before',
+                    'Whether to apply dropout "before" or "after" pooling.')
 flags.DEFINE_float('keep_p_conv',
                    0.9,
                    ('The probability that an element of a given tensor is kept'
@@ -28,13 +38,6 @@ flags.DEFINE_float('keep_p_fc',
                    0.5,
                    ('The probability that an element of the tensor produced by'
                     'the first fully-connected layer is kept.'))
-flags.DEFINE_string('relu',
-                    'scaled',
-                    ('Type of ReLU to use: "vanilla", "scaled", "exp", "leaky"'
-                     ', "cap6", "softsign", "softplus"'))
-flags.DEFINE_integer('num_epochs',
-                     10,
-                     'Number of epochs to train for.')
 flags.DEFINE_boolean('do_test',
                      False,
                      ('If true, trains on whole training set and then tests '
@@ -49,6 +52,10 @@ flags.DEFINE_boolean('save_model',
                       'at the end of training.'))
 flags.DEFINE_string('restore_model',
                     None,
+                    ('If not None, will restore to the model pointed to before'
+                     'training.'))
+flags.DEFINE_boolean('write_mistakes',
+                     None,
                     ('If not None, will restore to the model pointed to before'
                      'training.'))
 
@@ -142,16 +149,21 @@ def convolute(X, W, b, stride=1):
                      strides=[1, stride, stride, 1],
                      padding='SAME')
     X = activate(tf.nn.bias_add(X, b))
-    return tf.nn.dropout(X, keep_p_conv)
+    if FLAGS.dropout_loc == 'before':
+        X = tf.nn.dropout(X, keep_p_conv)
+    return X
 
 
 def apply_max_pooling(X, kernel_size=2):
     # Stride of the kernel is always >= its size to prevent
     # overlap of pooling region.
-    return tf.nn.max_pool(X,
-                          ksize=[1, kernel_size, kernel_size, 1],
-                          strides=[1, kernel_size, kernel_size, 1],
-                          padding='SAME')
+    X = tf.nn.max_pool(X,
+                       ksize=[1, kernel_size, kernel_size, 1],
+                       strides=[1, kernel_size, kernel_size, 1],
+                       padding='SAME')
+    if FLAGS.dropout_loc == 'after':
+        X = tf.nn.dropout(X, keep_p_conv)
+    return X
 
 
 def get_fc1_layer(conv_layer):
@@ -171,12 +183,8 @@ def get_predicted_labels(fc1_layer):
 
 
 def apply_cnn(X, weights, biases):
-    conv_layer = convolute(X,
-                             weights['c1'],
-                             biases['c1'])
-    pooled_conv_layer = apply_max_pooling(conv_layer,
-                                          kernel_size=pooling_kernel_sizes[1])
-    for i in range(2, (num_hidden_layers + 1)):
+    conv_layer = X
+    for i in range(1, (num_hidden_layers + 1)):
         conv_layer = convolute(conv_layer,
                                weights[f'c{i}'],
                                biases[f'c{i}'])
