@@ -56,8 +56,8 @@ flags.DEFINE_string('restore_model',
                      'training.'))
 flags.DEFINE_boolean('write_mistakes',
                      None,
-                    ('If not None, will restore to the model pointed to before'
-                     'training.'))
+                     ('If not None, will restore to the model pointed to '
+                      'before training.'))
 
 # Manage data.
 if FLAGS.download_data:
@@ -99,8 +99,7 @@ final_size = image_size
 for i in range(1, len(pooling_kernel_sizes)):
     final_size /= pooling_kernel_sizes[i]
 weights['fc1'] = tf.get_variable('wfc1',
-                                 shape=(find_final_size() *
-                                        find_final_size() *
+                                 shape=(final_size * final_size *
                                         num_filters_per_layer[num_hidden_layers],
                                         fc_layer_size),
                                  initializer=tf.contrib.layers.xavier_initializer())
