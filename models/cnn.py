@@ -59,7 +59,6 @@ flags.DEFINE_string('restore_model',
 #as soon as the fiurst actual mistake is found.
 
 
-
 # Manage data.
 if FLAGS.download_data:
     os.system(f'mkdir data data/{FLAGS.dataset}')
@@ -214,7 +213,7 @@ def get_true_vs_predicted_labels(true, predicted):
 
 def get_confusion_matrix(true_vs_predicted_labels):
     confusion_matrix = np.zeros((num_classes, num_classes))
-    for i in range(true_vs_predicted_labels.shape[0]):
+    for i in range(len(true_vs_predicted_labels)):
         confusion_matrix[int(true_vs_predicted_labels[i, 0]),
                          int(true_vs_predicted_labels[i, 1])] += 1
     return confusion_matrix
@@ -296,7 +295,6 @@ if not FLAGS.do_test:
                        f'training loss: {batch_loss: .3f}, '
                        f'training accuracy: {batch_accuracy: .3f}.'))
             print('-' * 58)
-
             if FLAGS.save_model:
                 save_path = save_model.save(sess,
                                             (f'model_checkpoints/{start_dt}'
@@ -304,8 +302,7 @@ if not FLAGS.do_test:
 
             validation_loss = list()
             validation_accuracy = list()
-            true_vs_predicted_labels = np.zeros((len(validation_X),
-                                                 num_classes))
+            true_vs_predicted_labels = np.zeros((len(validation_X), 2))
             # Feeding the whole validation set (about 15000 examples) takes
             # more memory than we have (~11 GB).
             # Therefore, find 'validation_loss' and 'validation_accuracy' by
@@ -322,17 +319,15 @@ if not FLAGS.do_test:
                                                                             predicted_labels],
                                                                            feed_dict={X: batch_X,
                                                                                       y: batch_y})
-
                 validation_loss.append(batch_loss)
                 validation_accuracy.append(batch_accuracy)
                 true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(true,
                                                                                predicted)
             overall_loss = np.mean(validation_loss)
             overall_accuracy = np.mean(validation_accuracy)
-            confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
             print((f'Validation loss: {overall_loss: .3f}, '
-                   f'validation accuracy: {overall_accuracy: .3f}.'),
-                  end='\n')
+                   f'validation accuracy: {overall_accuracy: .3f}.'))
+            confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
             print("Confusion matrix (true vs predicted):")
             print(confusion_matrix)
             if (num_classes == 2):
@@ -403,15 +398,12 @@ else:
                    f'training loss: {batch_loss: .3f}, '
                    f'training accuracy: {batch_accuracy: .3f}.'))
         print('-' * 58)
-
         if FLAGS.save_model:
                 save_path = save_model.save(sess,
                                             f'model_checkpoints/{start_dt}_t')
-
         test_loss = list()
         test_accuracy = list()
-        true_vs_predicted_labels = np.zeros((len(train_X),
-                                            num_classes))
+        true_vs_predicted_labels = np.zeros((len(train_X), 2))
         # Feeding the whole test set (about 5000 examples) takes more memory
         # than we have (~11 GB).
         # Therefore, find 'test_loss' and 'test_accuracy' by taking batches of
@@ -432,11 +424,11 @@ else:
             test_accuracy.append(batch_accuracy)
             true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(true,
                                                                            predicted)
-        confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
         overall_loss = np.mean(test_loss)
         overall_accuracy = np.mean(test_accuracy)
         print((f'Test loss: {overall_loss: .3f}, '
                f'test accuracy: {overall_accuracy: .3f}.'))
+        confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
         print("Confusion matrix (true vs predicted):")
         print(confusion_matrix)
         if (num_classes == 2):
