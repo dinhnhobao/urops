@@ -3,7 +3,7 @@ import datetime
 
 import h5py
 import numpy as np
-import tensorflow as tf  # Version 1.9
+import tensorflow as tf  # Built on version 1.9.
 
 
 # Command-line flags.
@@ -21,10 +21,12 @@ flags.DEFINE_float('learning_rate',
                    'Initial learning rate.')
 flags.DEFINE_float('conv_keep_p',
                    0.9,
-                   ')
+                   ('The probability that an element of a given tensor is kept'
+                    ', for tensors produced by convolution.'))
 flags.DEFINE_float('fc_keep_p',
                    0.5,
-                   ')
+                   ('The probability that an element of the tensor produced by'
+                    'the first fully-connected layer is kept.'))
 flags.DEFINE_string('relu_type',
                     'parametric',
                     ('Type of ReLU to use: "parametric", "leaky", '
