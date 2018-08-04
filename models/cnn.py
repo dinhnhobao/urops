@@ -55,9 +55,8 @@ flags.DEFINE_string('restore_model',
                     ('If not None, will restore to the model pointed to before'
                      'training.'))
 flags.DEFINE_boolean('write_mistakes',
-                     None,
-                     ('If not None, will restore to the model pointed to '
-                      'before training.'))
+                     True,
+                     'sfasfs')
 
 # Manage data.
 if FLAGS.download_data:
@@ -109,7 +108,7 @@ weights['fc2'] = tf.get_variable('wfc2',
 
 biases = dict()
 for i in range(1, (num_hidden_layers + 1)):
-    biases['c{i}'] = tf.get_variable(f'bc{i}',
+    biases[f'c{i}'] = tf.get_variable(f'bc{i}',
                                      shape=(num_filters_per_layer[i]),
                                      initializer=tf.contrib.layers.xavier_initializer())
 biases['fc1'] = tf.get_variable('bfc1',
