@@ -73,92 +73,45 @@ num_epochs = FLAGS.num_epochs
 learning_rate = FLAGS.learning_rate
 batch_size = 256
 num_hidden_layers = 6
-num_filters_per_layer = [None, 64, 128, 256, 512, 1024, 2048]
+num_filters_per_layer = [num_channels, 64, 128, 256, 512, 1024, 2048]
 fc_layer_size = 4096
 filter_sizes = [None, 5, 3, 3, 3, 3, 1]
 pooling_kernel_sizes = [None, 2, 2, 2, 2, 2, 2]
 
-
-# Assumes stride when pooling is 1, and padding when convoluting is 'SAME'.
-def find_final_size():
-    final_size = image_size
-    for i in range(1, len(pooling_kernel_sizes)):
-        final_size /= pooling_kernel_sizes[i]
-    return int(final_size)
-
-
 # Create dictionaries for the weight and bias parameters.
-weights = {
-    'c1': tf.get_variable('wc1',
-                          shape=(filter_sizes[1],
-                                 filter_sizes[1],
-                                 num_channels,
-                                 num_filters_per_layer[1]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c2': tf.get_variable('wc2',
-                          shape=(filter_sizes[2],
-                                 filter_sizes[2],
-                                 num_filters_per_layer[1],
-                                 num_filters_per_layer[2]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c3': tf.get_variable('wc3',
-                          shape=(filter_sizes[3],
-                                 filter_sizes[3],
-                                 num_filters_per_layer[2],
-                                 num_filters_per_layer[3]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c4': tf.get_variable('wc4',
-                          shape=(filter_sizes[4],
-                                 filter_sizes[4],
-                                 num_filters_per_layer[3],
-                                 num_filters_per_layer[4]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c5': tf.get_variable('wc5',
-                          shape=(filter_sizes[5],
-                                 filter_sizes[5],
-                                 num_filters_per_layer[4],
-                                 num_filters_per_layer[5]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c6': tf.get_variable('wc6',
-                          shape=(filter_sizes[6],
-                                 filter_sizes[6],
-                                 num_filters_per_layer[5],
-                                 num_filters_per_layer[6]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'fc1': tf.get_variable('wfc1',
-                           shape=(find_final_size() * find_final_size() *
-                                  num_filters_per_layer[6],
-                                  fc_layer_size),
-                           initializer=tf.contrib.layers.xavier_initializer()),
-    'fc2': tf.get_variable('wfc2',
-                           shape=(fc_layer_size,
-                                  num_classes),
-                           initializer=tf.contrib.layers.xavier_initializer())}
-biases = {
-    'c1': tf.get_variable('bc1',
-                          shape=(num_filters_per_layer[1]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c2': tf.get_variable('bc2',
-                          shape=(num_filters_per_layer[2]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c3': tf.get_variable('bc3',
-                          shape=(num_filters_per_layer[3]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c4': tf.get_variable('bc4',
-                          shape=(num_filters_per_layer[4]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c5': tf.get_variable('bc5',
-                          shape=(num_filters_per_layer[5]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'c6': tf.get_variable('bc6',
-                          shape=(num_filters_per_layer[6]),
-                          initializer=tf.contrib.layers.xavier_initializer()),
-    'fc1': tf.get_variable('bfc1',
-                           shape=(fc_layer_size),
-                           initializer=tf.contrib.layers.xavier_initializer()),
-    'fc2': tf.get_variable('bfc2',
-                           shape=(num_classes),
-                           initializer=tf.contrib.layers.xavier_initializer())}
+weights = dict()
+for i in range(1, (num_hidden_layers + 1)):
+    weights[f'c{i}'] = tf.get_variable(f'wc{i}',
+                                       shape=(filter_sizes[i],
+                                              filter_sizes[i],
+                                              num_filters_per_layer[i - 1],
+                                              num_filters_per_layer[i]),
+                                       initializer=tf.contrib.layers.xavier_initializer())
+# Assumes stride when pooling is 1, and padding when convoluting is 'SAME'.
+final_size = image_size
+for i in range(1, len(pooling_kernel_sizes)):
+    final_size /= pooling_kernel_sizes[i]
+weights['fc1'] = tf.get_variable('wfc1',
+                                 shape=(find_final_size() *
+                                        find_final_size() *
+                                        num_filters_per_layer[num_hidden_layers],
+                                        fc_layer_size),
+                                 initializer=tf.contrib.layers.xavier_initializer())
+weights['fc2'] = tf.get_variable('wfc2',
+                                 shape=(fc_layer_size, num_classes),
+                                 initializer=tf.contrib.layers.xavier_initializer())
+
+biases = dict()
+for i in range(1, (num_hidden_layers + 1)):
+    biases['c{i}'] = tf.get_variable(f'bc{i}',
+                                     shape=(num_filters_per_layer[i]),
+                                     initializer=tf.contrib.layers.xavier_initializer())
+biases['fc1'] = tf.get_variable('bfc1',
+                                shape=(fc_layer_size),
+                                initializer=tf.contrib.layers.xavier_initializer()),
+biases['fc2'] = tf.get_variable('bfc2',
+                                shape=(num_classes),
+                                initializer=tf.contrib.layers.xavier_initializer())
 
 
 def activate(X):
@@ -218,37 +171,18 @@ def get_predicted_labels(fc1_layer):
 
 
 def apply_cnn(X, weights, biases):
-    conv_layer_1 = convolute(X,
+    conv_layer = convolute(X,
                              weights['c1'],
                              biases['c1'])
-    pooled_conv_layer_1 = apply_max_pooling(conv_layer_1,
-                                            kernel_size=pooling_kernel_sizes[1])
-    conv_layer_2 = convolute(pooled_conv_layer_1,
-                             weights['c2'],
-                             biases['c2'])
-    pooled_conv_layer_2 = apply_max_pooling(conv_layer_2,
-                                            kernel_size=pooling_kernel_sizes[2])
-    conv_layer_3 = convolute(pooled_conv_layer_2,
-                             weights['c3'],
-                             biases['c3'])
-    pooled_conv_layer_3 = apply_max_pooling(conv_layer_3,
-                                            kernel_size=pooling_kernel_sizes[3])
-    conv_layer_4 = convolute(pooled_conv_layer_3,
-                             weights['c4'],
-                             biases['c4'])
-    pooled_conv_layer_4 = apply_max_pooling(conv_layer_4,
-                                            kernel_size=pooling_kernel_sizes[4])
-    conv_layer_5 = convolute(pooled_conv_layer_4,
-                             weights['c5'],
-                             biases['c5'])
-    pooled_conv_layer_5 = apply_max_pooling(conv_layer_5,
-                                            kernel_size=pooling_kernel_sizes[5])
-    conv_layer_6 = convolute(pooled_conv_layer_5,
-                             weights['c6'],
-                             biases['c6'])
-    pooled_conv_layer_6 = apply_max_pooling(conv_layer_6,
-                                            kernel_size=pooling_kernel_sizes[6])
-    fc1_layer = get_fc1_layer(pooled_conv_layer_6)
+    pooled_conv_layer = apply_max_pooling(conv_layer,
+                                          kernel_size=pooling_kernel_sizes[1])
+    for i in range(2, (num_hidden_layers + 1)):
+        conv_layer = convolute(conv_layer,
+                               weights[f'c{i}'],
+                               biases[f'c{i}'])
+        conv_layer = apply_max_pooling(conv_layer,
+                                       kernel_size=pooling_kernel_sizes[i])
+    fc1_layer = get_fc1_layer(conv_layer)
     return get_predicted_labels(fc1_layer)
 
 
