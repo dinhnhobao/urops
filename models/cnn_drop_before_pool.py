@@ -74,7 +74,7 @@ learning_rate = FLAGS.learning_rate
 batch_size = 256
 num_hidden_layers = 6
 num_filters_per_layer = [None, 64, 128, 256, 512, 1024, 2048]
-fc_layer_size = 2048
+fc_layer_size = 4096
 filter_sizes = [None, 5, 3, 3, 3, 3, 1]
 pooling_kernel_sizes = [None, 2, 2, 2, 2, 2, 2]
 
@@ -163,7 +163,7 @@ biases = {
 
 def activate(X):
     if FLAGS.relu == 'vanilla':
-        X = tf.nn.relu(X)
+        return tf.nn.relu(X)
     elif FLAGS.relu == 'scaled':
         return tf.nn.selu(X)
     elif FLAGS.relu == 'exp':
@@ -309,8 +309,8 @@ if not FLAGS.do_test:
                                                                            find_accuracy],
                                                                           feed_dict={X: batch_X,
                                                                                      y: batch_y,
-                                                                                     keep_p_conv: FLAGS.conv_keep_p,
-                                                                                     keep_p_fc: FLAGS.fc_keep_p})
+                                                                                     keep_p_conv: FLAGS.keep_p_conv,
+                                                                                     keep_p_fc: FLAGS.keep_p_fc})
                         summary_writer.add_summary(summary, summary_counter)
                     else:
                         _, batch_loss, batch_accuracy = sess.run([optimize,
@@ -318,8 +318,8 @@ if not FLAGS.do_test:
                                                                   find_accuracy],
                                                                  feed_dict={X: batch_X,
                                                                             y: batch_y,
-                                                                            keep_p_conv: FLAGS.conv_keep_p,
-                                                                            keep_p_fc: FLAGS.fc_keep_p})
+                                                                            keep_p_conv: FLAGS.keep_p_conv,
+                                                                            keep_p_fc: FLAGS.keep_p_fc})
                 print((f'Epoch {epoch} | '
                        f'training loss: {batch_loss: .3f}, '
                        f'training accuracy: {batch_accuracy: .3f}.'))
@@ -397,8 +397,8 @@ else:
                                                                        find_accuracy],
                                                                       feed_dict={X: batch_X,
                                                                                  y: batch_y,
-                                                                                 keep_p_conv: FLAGS.conv_keep_p,
-                                                                                 keep_p_fc: FLAGS.fc_keep_p})
+                                                                                 keep_p_conv: FLAGS.keep_p_conv,
+                                                                                 keep_p_fc: FLAGS.keep_p_fc})
                     summary_writer.add_summary(summary, summary_counter)
                 else:
                     _, batch_loss, batch_accuracy = sess.run([optimize,
@@ -406,8 +406,8 @@ else:
                                                               find_accuracy],
                                                              feed_dict={X: batch_X,
                                                                         y: batch_y,
-                                                                        keep_p_conv: FLAGS.conv_keep_p,
-                                                                        keep_p_fc: FLAGS.fc_keep_p})
+                                                                        keep_p_conv: FLAGS.keep_p_conv,
+                                                                        keep_p_fc: FLAGS.keep_p_fc})
             print((f'Epoch {epoch} | '
                    f'training loss: {batch_loss: .3f}, '
                    f'training accuracy: {batch_accuracy: .3f}.'))
