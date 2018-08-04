@@ -1,5 +1,6 @@
 import os
 import datetime
+import random
 
 import h5py
 import numpy as np
@@ -19,20 +20,20 @@ flags.DEFINE_boolean('download_data',
 flags.DEFINE_float('learning_rate',
                    0.0001,
                    'Initial learning rate.')
-flags.DEFINE_float('conv_keep_p',
+flags.DEFINE_float('keep_p_conv',
                    0.9,
                    ('The probability that an element of a given tensor is kept'
                     ', for tensors produced by convolution.'))
-flags.DEFINE_float('fc_keep_p',
+flags.DEFINE_float('keep_p_fc',
                    0.5,
                    ('The probability that an element of the tensor produced by'
                     'the first fully-connected layer is kept.'))
-flags.DEFINE_string('relu_type',
-                    'parametric',
-                    ('Type of ReLU to use: "parametric", "leaky", '
-                     '"concatenated", or "vanilla".'))
+flags.DEFINE_string('relu',
+                    'scaled',
+                    ('Type of ReLU to use: "vanilla", "scaled", "exp", "leaky"'
+                     ', "cap6", "softsign", "softplus"'))
 flags.DEFINE_integer('num_epochs',
-                     5,
+                     10,
                      'Number of epochs to train for.')
 flags.DEFINE_boolean('do_test',
                      False,
@@ -64,6 +65,8 @@ num_classes = 2
 num_splits = 3
 X = tf.placeholder('float', [None, image_size, image_size, num_channels])
 y = tf.placeholder('float', [None, num_classes])
+keep_p_conv = tf.placeholder_with_default(1.0, shape=())
+keep_p_fc = tf.placeholder_with_default(1.0, shape=())
 
 # Set key hyperparameters.
 num_epochs = FLAGS.num_epochs
@@ -71,7 +74,7 @@ learning_rate = FLAGS.learning_rate
 batch_size = 256
 num_hidden_layers = 6
 num_filters_per_layer = [None, 64, 128, 256, 512, 1024, 2048]
-fc_layer_size = 4096
+fc_layer_size = 2048
 filter_sizes = [None, 5, 3, 3, 3, 3, 1]
 pooling_kernel_sizes = [None, 2, 2, 2, 2, 2, 2]
 
@@ -79,7 +82,7 @@ pooling_kernel_sizes = [None, 2, 2, 2, 2, 2, 2]
 # Assumes stride when pooling is 1, and padding when convoluting is 'SAME'.
 def find_final_size():
     final_size = image_size
-    for i in range(len(pooling_kernel_sizes)):
+    for i in range(1, len(pooling_kernel_sizes)):
         final_size /= pooling_kernel_sizes[i]
     return int(final_size)
 
@@ -98,7 +101,7 @@ weights = {
                                  num_filters_per_layer[1],
                                  num_filters_per_layer[2]),
                           initializer=tf.contrib.layers.xavier_initializer()),
-    'c3': tf.get_variable('wc3'
+    'c3': tf.get_variable('wc3',
                           shape=(filter_sizes[3],
                                  filter_sizes[3],
                                  num_filters_per_layer[2],
@@ -158,13 +161,24 @@ biases = {
                            initializer=tf.contrib.layers.xavier_initializer())}
 
 
-def apply_parametric_relu(X):
-    alphas = tf.get_variable('alpha', X.get_shape()[-1],
-                             initializer=tf.constant_initializer(0.0),
-                             dtype=tf.float32)
-    pos = tf.nn.relu(X)
-    neg = alphas * (X - abs(X)) * 0.5
-    return pos + neg
+def activate(X):
+    if FLAGS.relu == 'vanilla':
+        X = tf.nn.relu(X)
+    elif FLAGS.relu == 'scaled':
+        return tf.nn.selu(X)
+    elif FLAGS.relu == 'exp':
+        return tf.nn.elu(X)
+    elif FLAGS.relu == 'leaky':
+        return tf.nn.leaky_relu(X)
+    elif FLAGS.relu == 'cap6':
+        return tf.nn.relu6(X)
+    elif FLAGS.relu == 'softsign':
+        return tf.nn.softsign(X)
+    elif FLAGS.relu == 'softplus':
+        return tf.nn.softplus(X)
+    else:
+        raise ValueError(('ReLU choice not one of "vanilla", "scaled", "exp", '
+                          '"leaky", "cap6", "softsign", "softplus".'))
 
 
 def convolute(X, W, b, stride=1):
@@ -174,23 +188,11 @@ def convolute(X, W, b, stride=1):
     X = tf.nn.conv2d(X, W,
                      strides=[1, stride, stride, 1],
                      padding='SAME')
-    X = tf.nn.bias_add(X, b)
-    if FLAGS.relu_type == 'parametric':
-        X = apply_parametric_relu(X)
-    elif FLAGS.relu_type == 'leaky':
-        X = tf.nn.leaky_relu(X)
-    elif FLAGS.relu_type == 'concatenated':
-        X = tf.nn.crelu(X)
-    elif FLAGS.relu_type == 'vanilla':
-        X = tf.nn.relu(X)
-    else:
-        raise ValueError(('ReLU choice not one of "parametric", "leaky", '
-                          '"concatenated", or "vanilla".'))
-    keep_p_conv = tf.placeholder_with_default(1.0, shape=())
+    X = activate(tf.nn.bias_add(X, b))
     return tf.nn.dropout(X, keep_p_conv)
 
 
-def apply_apply_max_pooling(X, kernel_size=2):
+def apply_max_pooling(X, kernel_size=2):
     # Stride of the kernel is always >= its size to prevent
     # overlap of pooling region.
     return tf.nn.max_pool(X,
@@ -199,26 +201,14 @@ def apply_apply_max_pooling(X, kernel_size=2):
                           padding='SAME')
 
 
-def get_fc1_layer(flat_conv_layer):
+def get_fc1_layer(conv_layer):
     flat_conv_layer = tf.reshape(conv_layer,
                                  [-1,
                                   weights['fc1'].get_shape().as_list()[0]])
-    fc_layer = tf.add(tf.matmul(flat_conv_layer,
-                                weights['fc1']),
-                      biases['fc1'])
-    if FLAGS.relu_type == 'parametric':
-        fc_layer = apply_parametric_relu(fc_layer)
-    elif FLAGS.relu_type == 'leaky':
-        fc_layer = tf.nn.leaky_relu(fc_layer)
-    elif FLAGS.relu_type == 'concatenated':
-        fc_layer = tf.nn.crelu(fc_layer)
-    elif FLAGS.relu_type == 'vanilla':
-        fc_layer = tf.nn.relu(fc_layer)
-    else:
-        raise ValueError(('ReLU choice not one of "parametric", "leaky", '
-                          '"concatenated", or "vanilla".'))
-    keep_p_fc = tf.placeholder_with_default(1.0, shape=())
-    return tf.nn.dropout(fully_connected_layer, keep_p_fc)
+    fc_layer = activate(tf.add(tf.matmul(flat_conv_layer,
+                                         weights['fc1']),
+                               biases['fc1']))
+    return tf.nn.dropout(fc_layer, keep_p_fc)
 
 
 def get_predicted_labels(fc1_layer):
