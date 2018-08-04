@@ -1,6 +1,5 @@
 import os
 import datetime
-import random
 
 import h5py
 import numpy as np
@@ -54,10 +53,10 @@ flags.DEFINE_string('restore_model',
                     None,
                     ('If not None, will restore to the model pointed to before'
                      'training.'))
-flags.DEFINE_boolean('write_mistakes',
-                     False,
-                     'If True, )Remember to delete the first element from the two mistakes arrays
-as soon as the fiurst actual mistake is found.
+#flags.DEFINE_boolean('write_mistakes',
+ #                    False,
+  #                   'If True, )Remember to delete the first element from the two mistakes arrays
+#as soon as the fiurst actual mistake is found.
 
 
 
@@ -83,7 +82,7 @@ learning_rate = FLAGS.learning_rate
 batch_size = 256
 num_hidden_layers = 6
 num_filters_per_layer = [num_channels, 64, 128, 256, 512, 1024, 2048]
-fc_layer_size = 4096
+fc_layer_size = 2048
 filter_sizes = [None, 5, 3, 3, 3, 3, 1]
 pooling_kernel_sizes = [None, 2, 2, 2, 2, 2, 2]
 
@@ -207,8 +206,8 @@ find_accuracy = tf.reduce_mean(tf.cast(is_correct_prediction, tf.float32))
 tf.summary.scalar('Accuracy', find_accuracy)
 
 
-def get_true_vs_predicted_label(y, predicted_labels):
-    return np.concatenate((np.argmax(y, axis=1).reshape(-1, 1),
+def get_true_vs_predicted_labels(true, predicted):
+    return np.concatenate((np.argmax(true, axis=1).reshape(-1, 1),
                            np.argmax(predicted, axis=1).reshape(-1, 1)),
                           axis=1)
 
@@ -216,8 +215,8 @@ def get_true_vs_predicted_label(y, predicted_labels):
 def get_confusion_matrix(true_vs_predicted_labels):
     confusion_matrix = np.zeros((num_classes, num_classes))
     for i in range(true_vs_predicted_labels.shape[0]):
-        confusion_matrix[true_vs_predicted_labels[i, 0],
-                         true_vs_predicted_labels[i, 1]] += 1
+        confusion_matrix[int(true_vs_predicted_labels[i, 0]),
+                         int(true_vs_predicted_labels[i, 1])] += 1
     return confusion_matrix
 
 
@@ -238,8 +237,8 @@ save_model = tf.train.Saver()
 
 base_path = f'data/{FLAGS.dataset}'
 start_dt = str(datetime.datetime.now())[:19].replace(" ", "_")
-if FLAGS.write_mistakes:
-    mistake_images = np.zeros(1, image_size, image_size, num_channels)
+#if FLAGS.write_mistakes:
+#    mistake_images = np.zeros(1, image_size, image_size, num_channels)
 if not FLAGS.do_test:
     validation_accuracies = list()
     for curr_split_num in range(1, (num_splits + 1)):
@@ -260,7 +259,7 @@ if not FLAGS.do_test:
                 meta.restore(sess, ('model_checkpoints/'
                                     f'{FLAGS.restore_model}'))
             print()
-            print(f'Training on split {curr_split_num}.')
+            print(f'Training and validation on split {curr_split_num}.')
             print('-' * 58)
             summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
                                                     f'validation_mode/{start_dt}'
@@ -285,7 +284,6 @@ if not FLAGS.do_test:
                                                                                      keep_p_conv: FLAGS.keep_p_conv,
                                                                                      keep_p_fc: FLAGS.keep_p_fc})
                         summary_writer.add_summary(summary, summary_counter)
-                        print(lala)
                     else:
                         _, batch_loss, batch_accuracy = sess.run([optimize,
                                                                   find_loss,
@@ -318,31 +316,38 @@ if not FLAGS.do_test:
                 batch_y = validation_y[batch: min(batch + 1,
                                                   len(validation_y))]
                 # Calculate batch loss and accuracy.
-                batch_loss, batch_accuracy, true_vs_predicted_label = sess.run([find_loss,
-                                                                                find_accuracy,
-                                                                                get_true_vs_predicted_label],
-                                                                               feed_dict={X: batch_X,
-                                                                                          y: batch_y})
+                batch_loss, batch_accuracy, true, predicted = sess.run([find_loss,
+                                                                            find_accuracy,
+                                                                            y,
+                                                                            predicted_labels],
+                                                                           feed_dict={X: batch_X,
+                                                                                      y: batch_y})
+
                 validation_loss.append(batch_loss)
                 validation_accuracy.append(batch_accuracy)
-                np.concatenate(true_vs_predicted_labels,
-                               true_vs_predicted_label)
+                true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(true,
+                                                                               predicted)
             overall_loss = np.mean(validation_loss)
             overall_accuracy = np.mean(validation_accuracy)
-            validation_accuracies.append(overall_accuracy)
+            confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
             print((f'Validation loss: {overall_loss: .3f}, '
                    f'validation accuracy: {overall_accuracy: .3f}.'),
                   end='\n')
-            print(get_confusion_matrix(true_vs_predicted_labels))
+            print("Confusion matrix (true vs predicted):")
+            print(confusion_matrix)
             if (num_classes == 2):
                 print(f'Specificity: {get_specificity(confusion_matrix): .3f}')
                 print(f'Sensitivity: {get_sensitivity(confusion_matrix): .3f}')
+            print('-' * 58)
             print()
+            validation_accuracies.append(overall_accuracy)
             summary_writer.close()
+    print('-' * 58)
     print(f'Validation accuracy (K = {num_splits}):')
     print(f'Mean: {np.mean(validation_accuracies): .3f}')
     print(f'Median: {np.median(validation_accuracies): .3f}')
     print(f'Standard deviation: {np.std(validation_accuracies): .3f}')
+    print('-' * 58)
 else:
     test_set = h5py.File(f'{base_path}/test_set.hdf5', 'r')
     test_X, test_y = test_set['test_X'], test_set['test_y']
@@ -365,7 +370,7 @@ else:
                                                 f'test_mode/{start_dt}'),
                                                sess.graph)
         print()
-        print('Training on complete training set.')
+        print('Training and testing on complete dataset.')
         print('-' * 58)
         summary_counter = 0
         for epoch in range(1, (num_epochs + 1)):
@@ -397,6 +402,7 @@ else:
             print((f'Epoch {epoch} | '
                    f'training loss: {batch_loss: .3f}, '
                    f'training accuracy: {batch_accuracy: .3f}.'))
+        print('-' * 58)
 
         if FLAGS.save_model:
                 save_path = save_model.save(sess,
@@ -404,6 +410,8 @@ else:
 
         test_loss = list()
         test_accuracy = list()
+        true_vs_predicted_labels = np.zeros((len(train_X),
+                                            num_classes))
         # Feeding the whole test set (about 5000 examples) takes more memory
         # than we have (~11 GB).
         # Therefore, find 'test_loss' and 'test_accuracy' by taking batches of
@@ -414,15 +422,26 @@ else:
             batch_y = test_y[batch: min(batch + 1,
                                         len(test_y))]
             # Calculate batch loss and accuracy.
-            batch_loss, batch_accuracy = sess.run([find_loss,
-                                                   find_accuracy],
-                                                  feed_dict={X: batch_X,
-                                                             y: batch_y})
+            batch_loss, batch_accuracy, true, predicted = sess.run([find_loss,
+                                                                    find_accuracy,
+                                                                    y,
+                                                                    predicted_labels],
+                                                                   feed_dict={X: batch_X,
+                                                                              y: batch_y})
             test_loss.append(batch_loss)
             test_accuracy.append(batch_accuracy)
+            true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(true,
+                                                                           predicted)
+        confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
         overall_loss = np.mean(test_loss)
         overall_accuracy = np.mean(test_accuracy)
-        print()
         print((f'Test loss: {overall_loss: .3f}, '
-               f'test accuracy: {overall_accuracy: .3f}'))
+               f'test accuracy: {overall_accuracy: .3f}.'))
+        print("Confusion matrix (true vs predicted):")
+        print(confusion_matrix)
+        if (num_classes == 2):
+            print(f'Specificity: {get_specificity(confusion_matrix): .3f}')
+            print(f'Sensitivity: {get_sensitivity(confusion_matrix): .3f}')
+        print('-' * 58)
         summary_writer.close()
+print()
