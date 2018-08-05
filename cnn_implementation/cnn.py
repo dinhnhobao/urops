@@ -270,7 +270,7 @@ if not FLAGS.do_test:
                                     f'{FLAGS.restore_model}'))
             print()
             print(f'Training and validation on split {curr_split_num}.')
-            print('-' * 58)
+            print('-' * 60)
             summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
                                                     f'validation_mode/{start_dt}'
                                                     f'_split_{curr_split_num}'),
@@ -303,9 +303,9 @@ if not FLAGS.do_test:
                                                                             keep_p_conv: FLAGS.keep_p_conv,
                                                                             keep_p_fc: FLAGS.keep_p_fc})
                 print((f'Epoch {epoch} | '
-                       f'training loss: {batch_loss: .3f}, '
-                       f'training accuracy: {batch_accuracy: .3f}.'))
-            print('-' * 58)
+                       f'training loss: {batch_loss: .5f}, '
+                       f'training accuracy: {batch_accuracy: .5f}.'))
+            print('-' * 60)
             if FLAGS.save_model:
                 save_path = save_model.save(sess,
                                             (f'model_checkpoints/{start_dt}'
@@ -344,24 +344,24 @@ if not FLAGS.do_test:
                                   mistake_num)
             overall_loss = np.mean(validation_loss)
             overall_accuracy = np.mean(validation_accuracy)
-            print((f'Validation loss: {overall_loss: .3f}, '
-                   f'validation accuracy: {overall_accuracy: .3f}.'))
+            print((f'Validation loss: {overall_loss: .5f}, '
+                   f'validation accuracy: {overall_accuracy: .5f}.'))
             confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
             print("Confusion matrix (true vs predicted):")
             print(confusion_matrix)
             if (num_classes == 2):
-                print(f'Specificity: {get_specificity(confusion_matrix): .3f}')
-                print(f'Sensitivity: {get_sensitivity(confusion_matrix): .3f}')
-            print('-' * 58)
+                print(f'Specificity: {get_specificity(confusion_matrix): .5f}')
+                print(f'Sensitivity: {get_sensitivity(confusion_matrix): .5f}')
+            print('-' * 60)
             print()
             validation_accuracies.append(overall_accuracy)
             summary_writer.close()
-    print('-' * 58)
+    print('-' * 60)
     print(f'Validation accuracy (K = {num_splits}):')
-    print(f'Mean: {np.mean(validation_accuracies): .3f}')
-    print(f'Median: {np.median(validation_accuracies): .3f}')
-    print(f'Standard deviation: {np.std(validation_accuracies): .3f}')
-    print('-' * 58)
+    print(f'Mean: {np.mean(validation_accuracies): .5f}')
+    print(f'Median: {np.median(validation_accuracies): .5f}')
+    print(f'Standard deviation: {np.std(validation_accuracies): .5f}')
+    print('-' * 60)
 else:
     test_set = h5py.File(f'{base_path}/test_set.hdf5', 'r')
     test_X, test_y = test_set['test_X'], test_set['test_y']
@@ -385,7 +385,7 @@ else:
                                                sess.graph)
         print()
         print('Training and testing on complete dataset.')
-        print('-' * 58)
+        print('-' * 60)
         summary_counter = 0
         for epoch in range(1, (num_epochs + 1)):
             for batch in range(len(train_X) // batch_size):
@@ -414,9 +414,9 @@ else:
                                                                         keep_p_conv: FLAGS.keep_p_conv,
                                                                         keep_p_fc: FLAGS.keep_p_fc})
             print((f'Epoch {epoch} | '
-                   f'training loss: {batch_loss: .3f}, '
-                   f'training accuracy: {batch_accuracy: .3f}.'))
-        print('-' * 58)
+                   f'training loss: {batch_loss: .5f}, '
+                   f'training accuracy: {batch_accuracy: .5f}.'))
+        print('-' * 60)
         if FLAGS.save_model:
                 save_path = save_model.save(sess,
                                             f'model_checkpoints/{start_dt}_t')
@@ -453,14 +453,15 @@ else:
                               mistake_num)
         overall_loss = np.mean(test_loss)
         overall_accuracy = np.mean(test_accuracy)
-        print((f'Test loss: {overall_loss: .3f}, '
-               f'test accuracy: {overall_accuracy: .3f}.'))
+        print((f'Test loss: {overall_loss: .5f}, '
+               f'test accuracy: {overall_accuracy: .5f}.'))
         confusion_matrix = get_confusion_matrix(true_vs_predicted_labels)
         print("Confusion matrix (true vs predicted):")
         print(confusion_matrix)
         if (num_classes == 2):
-            print(f'Specificity: {get_specificity(confusion_matrix): .3f}')
-            print(f'Sensitivity: {get_sensitivity(confusion_matrix): .3f}')
-        print('-' * 58)
+            print(f'Specificity: {get_specificity(confusion_matrix): .5f}')
+            print(f'Sensitivity: {get_sensitivity(confusion_matrix): .5f}')
+        print('-' * 60)
         summary_writer.close()
 print()
+

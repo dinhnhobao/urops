@@ -176,96 +176,177 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	\hyperlink{https://github.com/nurmister/urops}{github.com/nurmister/urops}.
 \newpage
 \section{Creation of \textit{NUSLot}}
-	\textit{NUSLot} is the culmination of the data collection, processing, and labeling efforts of this 
-	project; it comprises of 50,000 labeled examples of spots of the parking lot belonging to block 
-	S17 at the Faculty of Science\footnote{This dataset can be found at: 
-	\hyperlink{https://goo.gl/fV2NXS}{goo.gl/fV2NXS}}. The following are three example images 
-	from this dataset:
-	\vskip 5mm
-	\begin{figure}[H]
-		\centering
-		\includegraphics[width=2cm]{figures/nuslot_example_1.jpg}
-		\caption{An occupied spot.}
-		\vspace{5mm}
-		\includegraphics[width=2cm]{figures/nuslot_example_2.jpg}
-		\caption{An empty spot.}
-		\vspace{5mm}
-		\includegraphics[width=2cm]{figures/nuslot_example_3.jpg}
-		\caption{Another empty spot. Notice the occlusion caused by the roof of the vehicle occupying 
-		the adjacent spot.}
-	\end{figure}
-	\hspace*{-6mm}More specifically, this dataset consists of 50,000 128-by-128 pixel BGR images of 
-	parking spots, taken between the fourteenth of June and the 24th of July. These images were taken 
-	from the following vantage:
-	\vskip 5mm
-	\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.5\textwidth]{figures/context_1.jpg}
-		\caption{A Raspberry Pi-based camera was mounted on this window,}
+	\subsection{Collection schedule and setup}
+		\textit{NUSLot} is the culmination of the data collection, processing, and labeling efforts of this 
+		project; it comprises of 50,000 labeled examples of spots of the parking lot belonging to block 
+		S17 at the Faculty of Science\footnote{This dataset can be found at: 
+		\hyperlink{https://goo.gl/fV2NXS}{goo.gl/fV2NXS}}. The following are three example images 
+		from this dataset:
 		\vskip 5mm
-		\includegraphics[width=0.5\textwidth]{figures/context_2.jpg}
-		\caption{located at the encircled position,}
-		\vskip 5mm
-		\includegraphics[width=0.5\textwidth]{figures/spots_wo_labels.png}
-		\caption{facing the following parking lot.}
-	\end{figure}
-	Pictures were taken every five minutes by a Raspberry Pi-based camera, as pictured below:
-	\vskip 5mm
-	\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_1.jpg}
-		\caption{The Raspberry Pi and its memory and power supply were enclosed in the cooled box.}
-		\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_2.jpg}
-		\caption{The camera module was mounted firmly on the window at a suitable angle.}
-		\includegraphics[width=0.7\textwidth]{figures/rpi_camera_3.jpg}
-		\caption{Measures were taken to mitigate the risk of fire -- the vantage was lacked ventilation and 
-		encountered direct sunlight.}
-	\end{figure}
-	The following is a list of the complete apparatus used:
-	\begin{enumerate}
-		\item Raspberry Pi Model B+, running Raspbian 4.14.
-		\begin{itemize}
-			\item[] Power supply: 20000 mAh USB powerbank, enclosed in a LiPo battery blast protector.
-			\item[] Memory: External 64 GB USB drive.
-		\end{itemize}
-		\item Raspberry Pi Camera Module V1.
-		\begin{itemize}
-			\item[] Connected to the Raspberry Pi using a two-meter flex cable.
-		\end{itemize}
-		\item Portable fan, modified to run off of a USB powerbank.
-		\begin{enumerate}
-			\item[] Power supply: 10000 mAh powerbank, enclosed in a LiPo battery blast protector.
-		\end{enumerate}
-	\end{enumerate}
-	The powerbanks lasted about a day given the high temperatures at the vantage. The Raspberry Pi 
-	and powerbanks were thus removed from the vantage each evening and replaced the subsequent 
-	morning. This was also done for security purposes, although the people and license plates were not 
-	identifiable in the taken pictures.
-	<Talk about that here>
 		\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.8\textwidth]{figures/spots_w_labels.png}
-		\caption{Each spot was assigned an ID for cropping and file-naming purposes.}
-	\end{figure}
+			\centering
+			\includegraphics[width=2cm]{figures/nuslot_example_1.jpg}
+			\caption{An occupied spot.}
+			\vspace{5mm}
+			\includegraphics[width=2cm]{figures/nuslot_example_2.jpg}
+			\caption{An empty spot.}
+			\vspace{5mm}
+			\includegraphics[width=2cm]{figures/nuslot_example_3.jpg}
+			\caption{Another empty spot. Notice the occlusion caused by the roof of the vehicle occupying 
+			the adjacent spot.}
+		\end{figure}
+		\hspace*{-6mm}More specifically, this dataset consists of 50,000 128-by-128 pixel BGR images of 
+		parking spots, taken between the fourteenth of June and the 24th of July. These images were taken 
+		from the following vantage:
+		\vskip 5mm
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.5\textwidth]{figures/context_1.jpg}
+			\caption{A Raspberry Pi-based camera was mounted on this window,}
+			\vskip 5mm
+			\includegraphics[width=0.5\textwidth]{figures/context_2.jpg}
+			\caption{located at the encircled position,}
+			\vskip 5mm
+			\includegraphics[width=0.5\textwidth]{figures/spots_wo_labels.png}
+			\caption{facing the following parking lot.}
+		\end{figure}
+		Pictures were taken every five minutes by a Raspberry Pi-based camera, as pictured below:
+		\vskip 5mm
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_1.jpg}
+			\caption{The Raspberry Pi and its memory and power supply were enclosed in the cooled box.}
+			\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_2.jpg}
+			\caption{The camera module was mounted firmly on the window at a suitable angle.}
+			\includegraphics[width=0.7\textwidth]{figures/rpi_camera_3.jpg}
+			\caption{Measures were taken to mitigate the risk of fire -- the vantage was lacked ventilation and 
+			encountered direct sunlight.}
+		\end{figure}
+		The following is a list of the complete apparatus used:
+		\begin{enumerate}
+			\item Raspberry Pi Model B+, running Raspbian 4.14.
+			\begin{itemize}
+				\item[] Power supply: 20000 mAh USB powerbank, enclosed in a LiPo battery blast protector.
+				\item[] Memory: External 64 GB USB drive.
+			\end{itemize}
+			\item Raspberry Pi Camera Module V1.
+			\begin{itemize}
+				\item[] Connected to the Raspberry Pi using a two-meter flex cable.
+			\end{itemize}
+			\item Portable fan, modified to run off of a USB powerbank.
+			\begin{enumerate}
+				\item[] Power supply: 10000 mAh powerbank, enclosed in a LiPo battery blast protector.
+			\end{enumerate}
+		\end{enumerate}
+		The powerbanks lasted about a day given the high temperatures at the vantage. The Raspberry Pi 
+		and powerbanks were thus removed from the vantage each evening and replaced the subsequent 
+		morning. This was also done for security purposes, although the people and license plates were not 
+		identifiable in the taken pictures.
+	
+	\subsection{Cropping of spots from complete images}
+		In the evenings, the pictures were cropped and labeled. The cropping process was 
+		fully automated	using the scripts of \texttt{label\_examples/crop\_spots/} 
+		following a one-time setup. 
+		Namely, each spot in the parking lot was assigned an ID for cropping and file-naming purposes:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.8\textwidth]{figures/spots_w_labels.png}
+			\caption{The spots and their IDs.}
+		\end{figure}
+		For each spot, ``cropping instructions'' were created using\\
+		\texttt{label\_examples/crop\_spots/get\_spot\_coords\_and\_angles.py}. This script accepts as flags
+		the path to an image and an angle to rotate the image (counter-clockwise) by. It then displays the
+		rotated image and allows users to drag-and-click green bounding boxes over it to ascertain the coordinates
+		of the region to crop the image to obtain a picture of the desired spot. It prints the coordinates of drawn
+		bounding boxes in the terminal from which the script is called. The following is an example of its use:
+		\begin{figure}[H]
+			\centering
+			%\includegraphics[width=0.75\textwidth\{figures/spot_coord_demo}
+			\caption{An example-attempt to obtain the right angle and coordinates to crop images for spot 18.}
+		\end{figure}
+		This tool was used to get cropping instructions for each spot. These instructions are stored in
+		\texttt{label\_examples/crop\_spots/crop\_instructions.csv}. They are 
+		accessed by
+		\texttt{label\_examples/crop\_spots/crop\_all\_spots.py}, which is itself called by
+		\texttt{label\_examples/crop\_spots/daily\_cropper.sh}. The latter is what the user has to call to automatically
+		crop all images placed in \texttt{label\_examples/pictures\_dump} into \texttt{label\_examples/pictures\_dump/cropped}.
+		The following is thus the cropping workflow:
+		\begin{enumerate}
+			\item User places all images to be cropped in \texttt{label\_examples/pictures\_dump}, and calls
+			\texttt{label\_examples/crop\_spots/daily\_cropper.sh}. 
+			\item The script calls \texttt{label\_examples/crop\_spots/crop\_all\_spots.py}, which pipes
+			shell commands to obtain the cropped image of each spot from each image to be cropped to
+			\texttt{label\_examples/crop\_spots/todo.sh}. These shell commands are calls to
+			\texttt{label\_examples/crop\_spots/crop.py}, which crops and saves a specified spot from a
+			single image, given its cropping instructions.
+			\item \texttt{label\_examples/crop\_spots/todo.sh} is deleted.
+		\end{enumerate}
+		Thus, apart from manual determination of each spot's cropping instructions, the user is insulated from
+		the otherwise tedious cropping process.
+		\begin{figure}[H]
+			\centering
+			%\includegraphics[width=0.75\textwidth]{figures/daily\_cropper\_example}
+			\caption{One call to \texttt{daily\_cropper.sh}, and all images are cropped.}
+		\end{figure}\\
 
-	In the evenings, the pictures were cropped and labeled. The cropping process was fully automated 
-	using the scripts of \texttt{labeling/cropping\_scripts/} following a one-time setup.
+	\subsection{Labeling of cropped images}
+		After cropping, the resulting images are to be transferred to\\
+		\texttt{label\_examples/label\_spots/pictures\_to\_label/} for labeling, 
+		which is done using 
+		\texttt{label\_examples/label\_spots/spot\_labeler.R}. This script displays
+		each cropped image in sequence, prompting the user to type a label for each
+		one. In the case of this problem, labels were either ``0'' or ``1'',
+		depending on whether the spot was empty or occupied respectively. Once each
+		image has been labelled, labels are written to a \texttt{.csv} file
+		entitled by the date the images were taken. The following is an example of
+		the labeling process:
+		\begin{figure}[H]
+			\centering
+			%\includegraphcs[width=0.75\textwidth]{figures/spot\_labeler\_example}
+			\caption{The image of each spot is displayed in sequence.}
+		\end{figure}
+	
+	\subsection{Serialization of data}
+		After data collection, processing, and labeling was completed, the data was
+		ready to be serialized. Namely, all labels were stored in \texttt{data/labels} and cropped
+		images in \texttt{data/cropped}, \texttt{save\_dataset/serialize\_dataset.ipynb}
+		was used to process the images and labels into NumPy arrays before serialization
+		into \texttt{.hdf5} binary files.  
+
+Labels in ../data/labels/.
+(Cropped) pictures in ../data/cropped/.
+../data/hdf5/ created to store the serialized datasets.
+		
+mention
+		
+		Mention that this turned out to be far more efficient than the built-in, popular, pickle module.
+		Kept running out of memory.
+  
+	\subsection{Culmination}
+		Describe the dataset and where to get it and other practical matters.			
+
 
 \section{Conclusion and extensions}
-The approach to the second objective, creation of the mobile application, is dependent on the 
-experiences from the first. Namely, the second objective will require upgrade of the camera to one 
-that is Internet-connected; powering and reliably connecting such a device can be challenging. 
-Moreover, the CNN will need to be placed on the cloud, with a suitable interface to handle 
-communication between the camera(s) taking the picture upon user request, the model serving 
-the prediction, and the user's mobile application. Amazon's Amazon Web Services offers us tools 
-to host CNNs on the cloud~\cite{aws}\relax. They offer serverless services that can scale 
-dynamically in capacity in response to demand, and are only billed per user request. Our 
-application intends to harness such services in its back-end.
-Nonetheless, increasing the resolution of information available to 
-those seeking a parking spot is not the only implication of this project, especially given that NUS' 
-parking lots are organized appropriately for demand. Rather, we truly view this project as a 
-capability-building exercise; a segue into greater problems that can be addressed by machine 
-learning--either by us or those who take reference to our experiences in the future.
+	Tell them your honest criticisms of it here, and how you learned that things
+	might not be suitable.
+
+	The approach to the second objective, creation of the mobile application, is
+	dependent on the experiences from the first. Namely, the second objective will
+	require upgrade of the camera to one that is Internet-connected; powering and
+	reliably connecting such a device can be challenging.  Moreover, the CNN will
+	need to be placed on the cloud, with a suitable interface to handle
+	communication between the camera(s) taking the picture upon user request, the
+	model serving the prediction, and the user's mobile application. Amazon's
+	Amazon Web Services offers us tools to host CNNs on the cloud~\cite{aws}\relax.
+	They offer serverless services that can scale dynamically in capacity in
+	response to demand, and are only billed per user request. Our application
+	intends to harness such services in its back-end.  Nonetheless, increasing the
+	resolution of information available to those seeking a parking spot is not the
+	only implication of this project, especially given that NUS' parking lots are
+	organized appropriately for demand. Rather, we truly view this project as a
+	capability-building exercise; a segue into greater problems that can be
+	addressed by machine learning--either by us or those who take reference to our
+	experiences in the future.
 
 \newpage
 \begin{thebibliography}{unsrt}
