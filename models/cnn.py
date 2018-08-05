@@ -2,9 +2,9 @@ import os
 import datetime
 
 import h5py
+import cv2
 import numpy as np
 import tensorflow as tf  # Built on version 1.9.
-import matplotlib.pyplot as plt
 
 start_dt = str(datetime.datetime.now())[:19].replace(" ", "_")
 
@@ -220,9 +220,9 @@ def write_mistake(mistake_image, true_vs_predicted, curr_split_num, mistake_num)
     base_path = f'mistake_images/{start_dt}_{curr_split_num}'
     os.system('if [ ! -d "mistake_images" ]; then mkdir mistake_images; fi;')
     os.system(f'if [ ! -d "{base_path}" ]; then mkdir {base_path}; fi;')
-    plt.imsave((f'{base_path}/{mistake_num}_t:{int(true_vs_predicted[0])}_'
+    cv2.imwrite((f'{base_path}/{mistake_num}_t:{int(true_vs_predicted[0])}_'
                 f'p:{int(true_vs_predicted[1])}.jpg'),
-               mistake_image)
+                mistake_image)
 
 
 def get_confusion_matrix(true_vs_predicted_labels):
