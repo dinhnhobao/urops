@@ -200,14 +200,45 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	\vskip 5mm
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.5\textwidth]{figures/context.jpg}
+		\includegraphics[width=0.5\textwidth]{figures/context_1.jpg}
 		\caption{A Raspberry Pi-based camera was mounted on this window,}
+		\vskip 5mm
 		\includegraphics[width=0.5\textwidth]{figures/context_2.jpg}
 		\caption{located at the encircled position,}
 		\vskip 5mm
 		\includegraphics[width=0.5\textwidth]{figures/spots_wo_labels.png}
 		\caption{facing the following parking lot.}
 	\end{figure}
+	Pictures were taken every five minutes by a Raspberry Pi-based camera, as pictured below:
+	\vskip 5mm
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_1.jpg}
+		\caption{The Raspberry Pi and its memory and power supply were enclosed in the cooled box.}
+		\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_2.jpg}
+		\caption{The camera module was mounted firmly on the window at a suitable angle.}
+		\includegraphics[width=0.7\textwidth]{figures/rpi_camera_3.jpg}
+		\caption{Measures were taken to mitigate the risk of fire -- the vantage was lacked ventilation and 
+		encountered direct sunlight.}
+	\end{figure}
+	The following is a list of the complete apparatus used:
+	\begin{enumerate}
+		\item Raspberry Pi Model B+, running Raspbian 4.14.
+		\begin{itemize}
+			\item[] Power supply: 20000 mAh USB powerbank, enclosed in a LiPo battery blast protector.
+			\item[] Memory: External 64 GB USB drive.
+		\end{itemize}
+		\item Raspberry Pi Camera Module V1.
+		\begin{itemize}
+			\item[] Connected to the Raspberry Pi using a two-meter flex cable.
+		\end{itemize}
+		\item Portable fan, modified to run off of a USB powerbank.
+		\begin{enumerate}
+			\item[] Power supply: 10000 mAh powerbank, enclosed in a LiPo battery blast protector.
+		\end{enumerate}
+	\end{enumerate}
+
+
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.8\textwidth]{figures/spots_w_labels.png}
