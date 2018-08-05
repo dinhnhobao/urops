@@ -9,13 +9,13 @@ Refer to `writeup/main.tex` for the context behind and the usage of this reposit
 
 Nonetheless, a brief overview:
 
-1. `NUSLot_google_drive_details` points to the *NUSLot* dataset, which comprises of two
+1. `NUSLot_google_drive_details/` points to the *NUSLot* dataset, which comprises of two
 datasets: `toy_dataset` and `full_dataset`.
-2. `cnn_implementation` contains the convolutional neural network Tensorflow implementation
+2. `cnn_implementation/` contains the convolutional neural network Tensorflow implementation
 trained and tested on the *NUSLot* dataset.
-3. `label_examples` contains scripts to crop example-images from full images, and assign labels
+3. `label_examples/` contains scripts to crop example-images from full images, and assign labels
 to them.
-4. `pi` contains configuration details of the Raspberry Pi used to obtain the data behind *NUSLot*. 
+4. `pi/` contains configuration details of the Raspberry Pi used to obtain the data behind *NUSLot*. 
 5. `save_dataset/` contains a script to serialize labeled image-based data, and was used to
 create *NUSLot/{full, toy}_dataset*
 
