@@ -8,5 +8,6 @@ to `pictures_to_label/`.
 3. Store the labels `.csv` file in `../../data/labels/` and the cropped images
 in `../../data/cropped/cropped_{date}/`, where date is the date these pictures
 were taken.
-4. The data is now ready for serialization if you do not wish to add any more
+4. The data is now ready for serialization using
+`../../save_date/serialize_dataset.ipynb` if you do not wish to add any more
 day's worth of data to `../../data/`.
