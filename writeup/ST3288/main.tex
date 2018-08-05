@@ -237,58 +237,19 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\item[] Power supply: 10000 mAh powerbank, enclosed in a LiPo battery blast protector.
 		\end{enumerate}
 	\end{enumerate}
-
-
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.8\textwidth]{figures/spots_w_labels.png}
 		\caption{Each spot was assigned an ID for cropping and file-naming purposes.}
 	\end{figure}
+	The powerbanks lasted about a day given the high temperatures at the vantage. The Raspberry Pi 
+	and powerbanks were thus removed from the vantage each evening and replaced the subsequent 
+	morning. This was also done for security purposes, although the people and license plates were not 
+	identifiable in the taken pictures.
 
-\begin{enumerate}
-	\item Construction of an Arduino-based camera to take pictures of an NUS parking lot over the 
-	course of about thirty days, in the manner of \textit{PKLot}. Then, to clean, label, securely store, 
-	and use this data to create CNNs.
-	\begin{adjustwidth}{6mm}{}
-		Doing so will help us understand the practical challenges involved in the collection of  
-		data appropriate for our use: such challenges could pertain to security, infrastructure, 
-		environment,  etc.
-	\end{adjustwidth}
-\end{enumerate}
-\newpage
-The first objective is to be addressed soon: an Arduino-based camera is being prepared and will 
-likely be gathering data through the month of May. This device will comprise of the following parts:
-\begin{enumerate}
-	\item Arduino Uno (an inexpensive microcontroller).
-	\item A five-megapixel camera module.
-	\item 64 GB microSD card.
-	\item Rechargeable 5200 mAh battery (with a protective sleeve).
-\end{enumerate}
+	In the evenings, the pictures were cropped and labeled. The cropping process was fully automated 
+	using the scripts of \texttt{labeling/cropping\_scripts/} following a one-time setup.
 
-We have taken inspiration from \textit{PKLot} in the creation of the data collection schedule: a 
-picture of the selected parking lot will be taken every five minutes during working hours over the 
-course of thirty days. This will total to about 2,880 pictures. Given that there are about 50 spots 
-in the selected lot, we will have about 140,000 examples to train and test our CNN on, after images
-of 	individual spots have been extracted from the pictures in the manner of figures 14, 15, and 16. 
-We intend to gather such a large number of examples because many issues that prevent neural 
-networks from training well are related to a lack of training examples.
-
-Our selected parking lot is that  Pictures will be 
-taken from a sufficiently-high vantage such that images cannot be used to identify people and car 
-plates. Moreover, as soon as pictures are taken, they will be encrypted using 256-bit AES 
-(Advanced Encryption Standard). This encryption helps protect the data against malicious 
-individuals who attempt to steal the device. Moreover, the device will be regularly visited: given 
-estimates of energy consumption, batteries will have to be replaced about every five days. After 
-the data collection has finished, pictures will be deleted from the microSD card and transferred to 
-FloydHub, where files can be accessed only by uploaders. FloydHub also uses 256-bit AES to 
-communicate with local machines to run jobs. They have taken measures to restrict the number of 
-users (to just two) who have administrative access to their servers. Finally, user passwords and 
-authentication tokens are not managed by them, but by Auth0. We believe this is more than 
-sufficient for our application and data.
-
-\hspace*{-6mm}The following is visual context to our data collection:
-
-\newpage
 The approach to the second objective, creation of the mobile application, is dependent on the 
 experiences from the first. Namely, the second objective will require upgrade of the camera to one 
 that is Internet-connected; powering and reliably connecting such a device can be challenging. 
@@ -300,8 +261,7 @@ dynamically in capacity in response to demand, and are only billed per user requ
 application intends to harness such services in its back-end.
 
 \section{Conclusion and extensions}
-The use of CNNs to ascertain the occupancy of parking lots has shown good promise, and is soon 
-to be applied to the local context. Nonetheless, increasing the resolution of information available to 
+Nonetheless, increasing the resolution of information available to 
 those seeking a parking spot is not the only implication of this project, especially given that NUS' 
 parking lots are organized appropriately for demand. Rather, we truly view this project as a 
 capability-building exercise; a segue into greater problems that can be addressed by machine 
