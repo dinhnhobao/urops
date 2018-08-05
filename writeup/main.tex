@@ -308,10 +308,21 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	
 	\subsection{Serialization of data}
 		After data collection, processing, and labeling was completed, the data was
-		ready to be serialized. Namely, all labels were stored in \texttt{data/labels} and cropped
-		images in \texttt{data/cropped}, \texttt{save\_dataset/serialize\_dataset.ipynb}
+		ready to be serialized. Namely, all labels were stored in \texttt{data/labels/} and cropped
+		images in \texttt{data/cropped/}, \texttt{save\_dataset/serialize\_dataset.ipynb}
 		was used to process the images and labels into NumPy arrays before serialization
 		into \texttt{.hdf5} binary files.  
+
+		The following is the process:
+		\begin{enumerate}
+			\item All cropped images and labels are used to create the feature and label matrices
+			(respetively).
+			\item These matrices are split up randomly into the train and test sets, with the test
+			set comprising of 10\% of the total number of examples at hand. The test set is then
+			saved as a \texttt{.hdf5} binary file in 
+		\end{enumerate}	
+
+		Talk in detail about the manner in which things are processed. There is quite a lot to say.
 
 Labels in ../data/labels/.
 (Cropped) pictures in ../data/cropped/.
