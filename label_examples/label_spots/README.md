@@ -4,7 +4,7 @@ use the scripts here to label them.
 1. If the directories do not already exist, create `pictures_to_label/` and
 `label_csvs/`. Transfer the cropped images from `../pictures_dump/cropped/`
 to `pictures_to_label/`.
-2. Use `spot_labeller.R` to create a labels `.csv` file in `labels_csv/`.
+2. Use `spot_labeler.R` to create a labels `.csv` file in `labels_csv/`.
 3. Store the labels `.csv` file in `../../data/labels/` and the cropped images
 in `../../data/cropped/cropped_{date}/`, where date is the date these pictures
 were taken.
