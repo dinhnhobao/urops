@@ -29,15 +29,16 @@ def click_and_crop(event, x, y, flags, param):
         # Draw a rectangle around the region of interest.
         cv2.rectangle(image, refPt[0], refPt[1], (0, 255, 0), 2)
 
-        print("[y:y+h, x:x+w]: [%d:%d, %d:%d]" %
+        print('[y:y+h, x:x+w]: [%d:%d, %d:%d]' %
               (refPt[0][1],
                refPt[1][1],
                refPt[0][0],
                refPt[1][0]))
-        cv2.imshow("image", image)
+        cv2.imshow('image', image)
 
 
 def rotate_image(image, angle):
+    """Rotates image 'image' by angle 'angle' clockwise."""
     image_height = image.shape[0]
     image_width = image.shape[1]
     diagonal_square = (image_width*image_width) + (image_height*image_height)
@@ -66,14 +67,16 @@ def rotate_image(image, angle):
                                    transform_matrix,
                                    (diagonal, diagonal),
                                    flags=cv2.INTER_LANCZOS4)
-    print("Angle: %d" % angle)
+    print('Angle: %d' % angle)
     return rotated_image
 
 
-# Construct the argument parser and parse the arguments.
+# Construct the argument parser and parse arguments regarding image path and
+# desired rotation.
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True, help="Path to the image")
-ap.add_argument("-a", "--angle", required=True, help="Angle to rotate before cropping")
+ap.add_argument('-i', '--image', required=True, help='Path to the image')
+ap.add_argument('-a', '--angle', required=True, help=('Angle to rotate before '
+                                                      'cropping'))
 args = vars(ap.parse_args())
 
 # Load the image, clone it, and setup the mouse callback function.

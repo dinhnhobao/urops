@@ -2,8 +2,11 @@ import argparse
 import math
 import cv2
 
+image_size = 128  # The height and width of each cropped image (in pixels).
+
 
 def rotate_image(image, angle):
+    """Rotates image 'image' by angle 'angle' clockwise."""
     image_height = image.shape[0]
     image_width = image.shape[1]
     diagonal_square = (image_width*image_width) + (image_height*image_height)
@@ -35,28 +38,28 @@ def rotate_image(image, angle):
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True, help="Path to the image")
-ap.add_argument("-a", "--angle", required=True, help="Angle to rotate before cropping")
-ap.add_argument("--x_one", required=True, help="Top-right x-coordinate")
-ap.add_argument("--y_one", required=True, help="Top-right y-coordinate")
-ap.add_argument("--x_two", required=True, help="Bottom-left x-coordinate")
-ap.add_argument("--y_two", required=True, help="Bottom-left y-coordinate")
-ap.add_argument("-l", "--label", required=True, help="Spot number")
-
+ap.add_argument('-i', '--image', required=True, help='Path to the image')
+ap.add_argument('-a', '--angle', required=True, help=('Angle to rotate before '
+                                                      'cropping'))
+ap.add_argument('--x_one', required=True, help='Top-right x-coordinate')
+ap.add_argument('--y_one', required=True, help='Top-right y-coordinate')
+ap.add_argument('--x_two', required=True, help='Bottom-left x-coordinate')
+ap.add_argument('--y_two', required=True, help='Bottom-left y-coordinate')
+ap.add_argument('-l', '--label', required=True, help='Spot number')
 args = vars(ap.parse_args())
 
-# Crops image of spot.
-cropped_image = rotate_image(cv2.imread("../pictures_dump/" + args["image"]),
-                             int(args["angle"]))[
-                             int(args["y_one"]):int(args["y_two"]),
-                             int(args["x_one"]):int(args["x_two"])]
+# Crops image of spot after rotation.
+cropped_image = rotate_image(cv2.imread('../pictures_dump/' + args['image']),
+                             int(args['angle']))[
+                             int(args['y_one']):int(args['y_two']),
+                             int(args['x_one']):int(args['x_two'])]
 
-# Resizes the cropped image to 128 by 128.
-resized_image = cv2.resize(cropped_image, (128, 128))
+# Resizes the cropped image to 'image_size' by 'image_size'.
+resized_image = cv2.resize(cropped_image, (image_size, image_size))
 
 try:
-    cv2.imwrite("../pictures_dump/cropped/"
-                + args["image"][0:(len(args["image"]) - 4)]
-                + "_" + args["label"] + ".jpg", resized_image)
+    cv2.imwrite('../pictures_dump/cropped/'
+                + args['image'][0:(len(args['image']) - 4)]
+                + '_' + args['label'] + '.jpg', resized_image)
 except:
-    print("Failed.")
+    print('Failed.')
