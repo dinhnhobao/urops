@@ -60,9 +60,12 @@ flags.DEFINE_boolean('write_mistakes',
                      ('If True, images corresponding to misclassified examples'
                       ' are written to disk.'))
 
+
+
 # Manage data.
 if FLAGS.download_data:
-    os.system(f'mkdir data data/{FLAGS.dataset}')
+    os.system('if [ ! -d "data" ]; then mkdir data; fi;')
+    os.system(f'if [ ! -d "data/{FLAGS.dataset}" ]; then mkdir data/{FLAGS.dataset}; fi;')
     os.system((f'chmod +x get_dataset_scripts/get_{FLAGS.dataset}.sh &&'
                f'./get_dataset_scripts/get_{FLAGS.dataset}.sh'))
 
@@ -215,10 +218,11 @@ def get_true_vs_predicted_labels(true, predicted):
 def write_mistake(mistake_image, true_vs_predicted, curr_split_num, mistake_num):
     curr_split_num = curr_split_num if curr_split_num != 0 else 't'
     base_path = f'mistake_images/{start_dt}_{curr_split_num}'
-    os.mkdir(base_path)
-    plt.imsave((f'{base_path}/{mistake_num}_t:{true_vs_predicted[0]}_'
-                'p:{true_vs_predicted[1]}.jpg'),
-               mistake_image[..., [2, 1, 0]])
+    os.system('if [ ! -d "mistake_images" ]; then mkdir mistake_images; fi;')
+    os.system(f'if [ ! -d "{base_path}" ]; then mkdir {base_path}; fi;')
+    plt.imsave((f'{base_path}/{mistake_num}_t:{int(true_vs_predicted[0])}_'
+                f'p:{int(true_vs_predicted[1])}.jpg'),
+               mistake_image)
 
 
 def get_confusion_matrix(true_vs_predicted_labels):
@@ -332,9 +336,9 @@ if not FLAGS.do_test:
                 true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(batch_y,
                                                                                predicted)
                 if (true_vs_predicted_labels[batch][0] != true_vs_predicted_labels[batch][1]
-                        & FLAGS.write_mistakes):
+                        and FLAGS.write_mistakes):
                     mistake_num += 1
-                    write_mistake(batch_X * train_mean_sd[1] + train_mean_sd[0],
+                    write_mistake(batch_X[0] * train_mean_sd[1] + train_mean_sd[0],
                                   true_vs_predicted_labels[batch],
                                   curr_split_num,
                                   mistake_num)
@@ -441,9 +445,9 @@ else:
             true_vs_predicted_labels[batch] = get_true_vs_predicted_labels(batch_y,
                                                                            predicted)
             if (true_vs_predicted_labels[batch][0] != true_vs_predicted_labels[batch][1]
-                    & FLAGS.write_mistakes):
+                    and FLAGS.write_mistakes):
                 mistake_num += 1
-                write_mistake(batch_X * train_mean_sd[1] + train_mean_sd[0],
+                write_mistake(batch_X[0] * train_mean_sd[1] + train_mean_sd[0],
                               true_vs_predicted_labels[batch],
                               0,
                               mistake_num)
