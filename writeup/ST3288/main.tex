@@ -55,6 +55,7 @@
 Applying machine learning techniques to determine the occupancy of parking lots}
 
 \author{\textsc{Rayakar Achal Ajeet, A0156139B}\\
+		\texttt{\hyperlink{achal@u.nus.edu}{achal@u.nus.edu}}\\
 		\textit{National University of Singapore}
 }
 
@@ -122,13 +123,13 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	\vskip 5mm
 	\begin{figure}[h]
 		\centering
-		\includegraphics[width=1cm]{figures/example_1.jpg}
+		\includegraphics[width=1cm]{figures/pklot_example_1.jpg}
 		\caption{An occupied spot from the first parking lot, in sunshine.}
 		\vspace{5mm}
-		\includegraphics[width=1cm]{figures/example_2.jpg}
+		\includegraphics[width=1cm]{figures/pklot_example_2.jpg}
 		\caption{An empty spot from one angle of the second parking lot, in overcast conditions.}
 		\vspace{5mm}
-		\includegraphics[width=1cm]{figures/example_3.jpg}
+		\includegraphics[width=1cm]{figures/pklot_example_3.jpg}
 		\caption{An occupied spot from the second angle of the second parking lot, in rain.}
 	\end{figure}
 	\hspace*{-6mm}The testing accuracies of the CNNs created for each lot in this dataset were greater 
@@ -165,14 +166,32 @@ Applying machine learning techniques to determine the occupancy of parking lots}
     	\includegraphics[width=14cm]{figures/floydhub.png}
     	\caption{Log of jobs run on FloydHub.}
     \end{figure}
+	\newpage
 	With the above results and tools, ST2288 was concluded. This left trialling of the practical 
-	application of this idea in the local context to ST3288.
+	application of this idea in the local context to ST3288. The rest of this report details the unique 
+	challenges involved in the creation and management of original data, the tools created in response, 
+	and the deep generalizability of the resulting CNN-creation workflow to other machine learning 
+	projects.
 
-\section{Motivations in ST3288}
-
-
-
-
+\section{Creation of \textit{NUSLot}}
+	\textit{NUSLot} is the culmination of the data collection, processing, and labeling efforts of this 
+	project; it comprises of 50,000 labeled examples of spots of the parking lot belonging to block 
+	S17 at the Faculty of Science\footnote{This dataset can be found at: 
+	\hyperlink{https://goo.gl/fV2NXS}{https://goo.gl/fV2NXS}}. The following are three example images 
+	from this dataset:
+	\vskip 5mm
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=1cm]{figures/pklot_example_1.jpg}
+		\caption{An occupied spot from the first parking lot, in sunshine.}
+		\vspace{5mm}
+		\includegraphics[width=1cm]{figures/pklot_example_2.jpg}
+		\caption{An empty spot from one angle of the second parking lot, in overcast conditions.}
+		\vspace{5mm}
+		\includegraphics[width=1cm]{figures/pklot_example_3.jpg}
+		\caption{An occupied spot from the second angle of the second parking lot, in rain.}
+	\end{figure}
+	\hspace*{-6mm}
 
 
 
@@ -215,7 +234,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		We intend to gather such a large number of examples because many issues that prevent neural 
 		networks from training well are related to a lack of training examples.
 		
-		Our selected parking lot is that belonging to block S17 at the Faculty of Science. Pictures will be 
+		Our selected parking lot is that  Pictures will be 
 		taken from a sufficiently-high vantage such that images cannot be used to identify people and car 
 		plates. Moreover, as soon as pictures are taken, they will be encrypted using 256-bit AES 
 		(Advanced Encryption Standard). This encryption helps protect the data against malicious 
@@ -232,13 +251,13 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\vskip 5mm
 		\begin{figure}[h]
 		    \centering
-		    \includegraphics[width=0.4\textwidth]{figures/context_used.jpg}
+		    \includegraphics[width=0.4\textwidth]{figures/context.jpg}
 		    \caption{The Arduino-camera will be mounted on this window,}
 		\end{figure}
 	
 		\begin{figure}[h]
 			\centering
-			\includegraphics[width=0.4\textwidth]{figures/context2_used.jpg}
+			\includegraphics[width=0.4\textwidth]{figures/context_2.jpg}
 			\caption{located at the encircled position,}
 			\vskip 5mm
 %		    \includegraphics[width=0.4\textwidth]{figures/view_full.jpg}
