@@ -33,3 +33,13 @@ writeup/*/main.out
 writeup/*/main.pdf
 writeup/*/main.synctex.gz
 writeup/*/main.toc
+
+.floydexpt
+*/.floydexpt
+*/*/.floydexpt
+*/*/*/.floydexpt
+
+.floydignore
+*/.floydignore
+*/*/.floydignore
+*/*/*/.floydignore
