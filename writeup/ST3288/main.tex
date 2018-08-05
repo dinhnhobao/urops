@@ -116,7 +116,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	found to work very well. A publicly-available parking lot image dataset, \textit{PKLot}, was used to 
 	train, validate, and test CNNs created\footnote{This dataset can be found at: 
 	\hyperlink{https://web.inf.ufpr.br/vri/databases/parking-lot-database/}
-	{https://web.inf.ufpr.br/vri/databases/parking-lot-database/}}. It comprises of 695,899 images of 
+	{web.inf.ufpr.br/vri/databases/parking-lot-database/}}. It comprises of 695,899 images of 
 	parking spots taken from two parking lots over the course of about 30 days, in which there was 
 	great variation of weather and illumination \cite{pklot-paper}\relax. The following are three example 
 	images from this dataset:
@@ -171,27 +171,30 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	application of this idea in the local context to ST3288. The rest of this report details the unique 
 	challenges involved in the creation and management of original data, the tools created in response, 
 	and the deep generalizability of the resulting CNN-creation workflow to other machine learning 
-	projects.
+	projects. The algorithms and files referred to in this report are as they are found on  
+	\hyperlink{https://github.com/nurmister/urops}{github.com/nurmister/urops}.
 
 \section{Creation of \textit{NUSLot}}
 	\textit{NUSLot} is the culmination of the data collection, processing, and labeling efforts of this 
 	project; it comprises of 50,000 labeled examples of spots of the parking lot belonging to block 
 	S17 at the Faculty of Science\footnote{This dataset can be found at: 
-	\hyperlink{https://goo.gl/fV2NXS}{https://goo.gl/fV2NXS}}. The following are three example images 
+	\hyperlink{https://goo.gl/fV2NXS}{goo.gl/fV2NXS}}. The following are three example images 
 	from this dataset:
 	\vskip 5mm
 	\begin{figure}[h]
 		\centering
-		\includegraphics[width=1cm]{figures/pklot_example_1.jpg}
-		\caption{An occupied spot from the first parking lot, in sunshine.}
+		\includegraphics[width=2cm]{figures/nuslot_example_1.jpg}
+		\caption{An occupied spot.}
 		\vspace{5mm}
-		\includegraphics[width=1cm]{figures/pklot_example_2.jpg}
-		\caption{An empty spot from one angle of the second parking lot, in overcast conditions.}
+		\includegraphics[width=2cm]{figures/nuslot_example_2.jpg}
+		\caption{An empty spot.}
 		\vspace{5mm}
-		\includegraphics[width=1cm]{figures/pklot_example_3.jpg}
-		\caption{An occupied spot from the second angle of the second parking lot, in rain.}
+		\includegraphics[width=2cm]{figures/nuslot_example_3.jpg}
+		\caption{Another empty spot. Notice the occlusion caused by the roof of the vehicle occupying 
+		the adjacent spot.}
 	\end{figure}
-	\hspace*{-6mm}
+	\hspace*{-6mm}More specifically, this dataset consists of 50,000 128-by-128 pixel BGR images of 
+	parking spots, taken between the fourteenth of June and the 24th of July. 
 
 
 
