@@ -27,12 +27,12 @@ models/floydexpt
 
 labelling/scripts/nohup.out
 
-writeup/*/main.aux
-writeup/*/main.log
-writeup/*/main.out
-writeup/*/main.pdf
-writeup/*/main.synctex.gz
-writeup/*/main.toc
+writeup/main.aux
+writeup/main.log
+writeup/main.out
+writeup/main.pdf
+writeup/main.synctex.gz
+writeup/main.toc
 
 .floydexpt
 */.floydexpt
