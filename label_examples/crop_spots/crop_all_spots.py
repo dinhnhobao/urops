@@ -12,7 +12,7 @@ def main():
     # Fill 'crop_instructions.csv' with the help of
     # "get_spot_coords_and_angles.py".
     instructions = pd.read_csv('crop_instructions.csv', index_col=False)
-    os.mkdir('if [ ! -d "../pictures_dump/cropped" ]; then mkdir data; fi;')
+    os.system('if [ ! -d "../pictures_dump/cropped" ]; then mkdir ../pictures_dump/cropped; fi;')
 
     num_done = 0
     all_pictures = os.listdir('../pictures_dump/')
@@ -27,7 +27,7 @@ def main():
                       + ' --y_one ' + str(instructions['y_one'][spot_number])
                       + ' --y_two ' + str(instructions['y_two'][spot_number])
                       + ' --label ' + str(instructions['label'][spot_number]))
-            print('echo ' + str(num_done) + '/' + str(len(all_pictures)))
+            print(f'echo {num_done}/{len(all_pictures)}')
 
 
 if __name__ == '__main__':

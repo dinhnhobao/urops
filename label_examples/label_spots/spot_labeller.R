@@ -1,30 +1,37 @@
 library(imager)
 
-directory <- "label_pictures/"
-date <- "2018-07-24"
-file_names <- list.files(directory, pattern="*.jpg")
+# Script that facilitates the labelling of a given set of cropped pictures.
+# Labels are stored in "label_csvs/{date}.csv" with the variables "date_id"
+# and "label".
+# Before running this script, set the working directory as the location of this
+# file.
 
-all_date_ids <- NULL
-all_labels <- NULL
+pictures_directory <- "pictures_to_label/"
+csvs_directory <- "label_csvs/"
+date <- "2018-07-24"
+
+file_names <- list.files(pictures_directory,
+                         pattern="*.jpg")
+date_id <- NULL
+label <- NULL
 for (index in 1:length(file_names)) {
-  image <- load.image(paste(directory, file_names[index], sep=""))
+  image <- load.image(paste(pictures_directory,
+                            file_names[index], sep=""))
   plot(image,
        main=paste(file_names[index],
                   paste(index, "/", length(file_names), sep="")))
-  all_date_ids <- c(all_date_ids,
-                     substr(file_names[index],
-                            start=1,
-                            stop=nchar(file_names[index]) - 4)
+  date_id <- c(date_id,
+               substr(file_names[index],
+                      start=1,
+                      stop=nchar(file_names[index]) - 4)
   )
-  input <- readline("Enter label: ")
-  all_labels <- c(all_labels, ifelse(input == "", 0, 1))
+  label <- c(label,
+             readline("Enter label: "))
   plot(load.image("white.png"))
 }
 
-result_df <- NULL
-result_df$date_id <- all_date_ids
-result_df$label <- all_labels
+result_df <- data.frame(date_id, label)
 rownames(result_df) <- NULL
 write.csv(result_df,
-          paste("label_csvs/", date, ".csv", sep=""),
+          paste(csvs_directory, date, ".csv", sep=""),
           row.names=FALSE)
