@@ -6,4 +6,6 @@ Required datasets can be found [here](https://drive.google.com/open?id=1_UIeomO1
 
 Refer to `writeup/main.tex` for context and usage.
 
-![](https://lh3.googleusercontent.com/AnfeQJq_ZAzAAp1keX0NAS_6vOby5PoXql_iZ0Udg91m0Y0kH4Grwzrhh_LdZcK0w7NcXOpyFEoMhLgehMHj=w2880-h1800)
+<p align="center"> 
+<img src="https://lh3.googleusercontent.com/AnfeQJq_ZAzAAp1keX0NAS_6vOby5PoXql_iZ0Udg91m0Y0kH4Grwzrhh_LdZcK0w7NcXOpyFEoMhLgehMHj=w2880-h1800">
+</p>
