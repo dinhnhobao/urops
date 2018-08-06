@@ -6,7 +6,7 @@ image_size = 128  # The height and width of each cropped image (in pixels).
 
 
 def rotate_image(image, angle):
-    """Rotates image 'image' by angle 'angle' clockwise."""
+    """Rotates image 'image' by angle 'angle' counter-clockwise."""
     image_height = image.shape[0]
     image_width = image.shape[1]
     diagonal_square = (image_width*image_width) + (image_height*image_height)

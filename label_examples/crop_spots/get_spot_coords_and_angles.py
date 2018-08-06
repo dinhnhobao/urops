@@ -38,7 +38,7 @@ def click_and_crop(event, x, y, flags, param):
 
 
 def rotate_image(image, angle):
-    """Rotates image 'image' by angle 'angle' clockwise."""
+    """Rotates image 'image' by angle 'angle' counter-clockwise."""
     image_height = image.shape[0]
     image_width = image.shape[1]
     diagonal_square = (image_width*image_width) + (image_height*image_height)
