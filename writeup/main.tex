@@ -192,13 +192,13 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	CNN implementation developed. The files referred to in the rest of this 
 	report are as they appear on 
 	\hyperlink{https://github.com/nurmister/urops}{github.com/nurmister/urops}.
-\section{Creation of \textit{NUSLot}}
+\section{Creation of a Singaporean \textit{PKLot}: \textit{NUSLot}}
 	\subsection{Collection schedule and setup}
 		\textit{NUSLot} is the culmination of the data collection, processing, and labeling efforts of this 
-		project; it comprises of 50,000 labeled examples of spots of the parking lot belonging to block 
-		S17 at the Faculty of Science\footnote{This dataset can be found at: 
-		\hyperlink{https://goo.gl/fV2NXS}{goo.gl/fV2NXS}}. The following are three example images 
-		from this dataset:
+		project. It comprises of 50,000 labeled examples of spots of the 
+		parking lot belonging to block 
+		S17 at the Faculty of Science. The following are 
+		three examples from this dataset:
 		\vskip 5mm
 		\begin{figure}[H]
 			\centering
@@ -212,7 +212,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\caption{Another empty spot. Notice the occlusion caused by the roof of the vehicle occupying 
 			the adjacent spot.}
 		\end{figure}
-		\hspace*{-6mm}More specifically, this dataset consists of 50,000 128-by-128 pixel BGR images of 
+		\hspace*{-6mm}More specifically, this dataset consists of 50,000 
+		128-by-128 pixel BGR JPEG images of 
 		parking spots, taken between the fourteenth of June and the 24th of July. These images were taken 
 		from the following vantage:
 		\vskip 5mm
@@ -228,40 +229,38 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\caption{facing the following parking lot.}
 		\end{figure}
 		\vskip -5mm
-		Pictures were taken every five minutes by a Raspberry Pi-based camera, as pictured below:
+		\hspace*{-6mm}Pictures were taken every five minutes by a Raspberry 
+		Pi-based camera, as pictured below:
 		\vskip 5mm
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.4\textwidth]{figures/rpi_camera_1.png}
-			\caption{The Raspberry Pi and its memory and power supply were 
+			\caption{The Raspberry Pi, its memory, and its power supply were 
 			enclosed in the cooled box.}
 			\vskip 5mm
 			\includegraphics[width=0.4\textwidth]{figures/rpi_camera_2.png}
 			\caption{The camera module was mounted firmly on the window at a 
 			suitable angle.}
 		\end{figure}
-		The following is a list of the complete apparatus used:
+		\hspace*{-6mm}The following were the apparatus used:
 		\begin{enumerate}
-			\setlength\itemsep{-3mm}
 			\item Raspberry Pi Model B+, running Raspbian 4.14.
+			\vskip -5mm
 			\begin{itemize}
-				\item[] Power supply: 20000 mAh USB powerbank, enclosed in a LiPo battery blast protector.
+				\item[] Power supply: 20,000 mAh USB battery pack, enclosed in 
+				a LiPo battery blast protector.
 				\item[] Memory: External 64 GB USB drive.
 			\end{itemize}
 			\item Raspberry Pi Camera Module V1.
 			\begin{itemize}
 				\item[] Connected to the Raspberry Pi using a two-meter flex cable.
 			\end{itemize}
-			\item Portable fan, modified to run off of a USB powerbank.
-			\begin{enumerate}
-				\item[] Power supply: 10000 mAh powerbank, enclosed in a LiPo battery blast protector.
-			\end{enumerate}
+			\item Portable fan, modified to run off of a 10,0000 USB battery 
+			pack (also enclosed in a LiPo battery blast protector).
 		\end{enumerate}
-		The powerbanks lasted about a day given the high temperatures at the vantage. The Raspberry Pi 
-		and powerbanks were thus removed from the vantage each evening and replaced the subsequent 
-		morning. This was also done for security purposes, although the people and license plates were not 
-		identifiable in the taken pictures.
-	
+		The battery packs lasted about a day given the high temperatures at the 
+		vantage. The Raspberry Pi and battery packs were thus removed each 
+		evening and replaced the subsequent morning.
 	\subsection{Cropping of spots from complete images}
 		In the evenings, the pictures were cropped and labeled. The cropping process was 
 		fully automated	using the scripts of \texttt{label\_examples/crop\_spots/} 
@@ -422,6 +421,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	This network, trained over 20 epochs, has a testing accuracy of 99.9\%, a specificity of about 1, and a
 	sensitivity of 0.998. This translates to the following confusion matrix:
 	\begin{equation}
+	\nonumber
 	\begin{pmatrix} 43348 & 1\\ 3 & 1648 \end{pmatrix}
 	\end{equation}
 	where the element at (0, 1), for example, represents the number of false 
