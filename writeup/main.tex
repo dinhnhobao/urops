@@ -412,137 +412,167 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 \section{Implementation of the CNN}
 	The CNN was implemented using TensorFlow version 1.9's low-level API to
 	allow for greater extensibility and functionality, which will be described 
-	in this section. Firstly, however, a description of the architecture and 
-	hyperparameters of the particular CNN used for this classification problem:
-	\begin{itemize}
-		\setlength\itemsep{-3mm}
-		\item[] (Learning rate: 0.0001)
-		\item[] \textbf{Input layer:} reads in 128-by-128 color images of 
-		parking spots.
-		\item[] \textbf{Convolutional layer 1:} applies 64 5-by-5 filters, and 
-		then the 
-		scaled exponential linear unit (SeLU) activation function 
-		\footnote{Using SeLU was found to lead to the fastest-learning CNN, 
-		reiterating past results: \cite{selu-motivation}\relax.}.
-		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
-		\item[] \textbf{Pooling layer 1:} performs max pooling with a 2-by-2 
-		filter.
-		\item[] \textbf{Convolutional layer 2:} applies 128 3-by-3 filters, and 
-		then the 
-		SeLU activation function.
-		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
-		\item[] \textbf{Pooling layer 2:} performs max pooling with a 2-by-2 
-		filter.
-		\item[] \textbf{Convolutional layer 3:} applies 256 3-by-3 filters, and 
-		then the 
-		SeLU activation function.
-		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
-		\item[] \textbf{Pooling layer 3:} performs max pooling with a 2-by-2 
-		filter.
-		\item[] \textbf{Convolutional layer 4:} applies 512 3-by-3 filters, and 
-		then the 
-		SeLU activation function.
-		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
-		\item[] \textbf{Pooling layer 4:} performs max pooling with a 2-by-2 
-		filter.
-		\item[] \textbf{Convolutional layer 5:} applies 1024 3-by-3 filters, 
-		and then 
-		the SeLU activation function.
-		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
-		\item[] \textbf{Pooling layer 5:} performs max pooling with a 2-by-2 
-		filter.
-		\item[] \textbf{Convolutional layer 6:} applies 2048 1-by-1 filters, 
-		and then 
-		the SeLU activation function.
-		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
-		\item[] \textbf{Pooling layer 6:} performs max pooling with a 2-by-2 
-		filter.
-		\item[] \textbf{Fully-connected layer 1:} comprises of 2048 neurons.
-		\item[] \textbf{Dropout} is applied with a keep probability of 0.90.
-		\item[] \textbf{Output layer:} comprises of 2 neurons, representing the 
-		output 
-		vector.
-		\vspace*{-4mm}
-		\begin{enumerate}
+	later in this section. Firstly, however, a description of the architecture 
+	and 
+	hyperparameters of the particular CNN used for this classification problem.
+	\subsection{Performance on \textit{NUSLot}}
+		\begin{itemize}
 			\setlength\itemsep{-3mm}
-			\item[] (0, 1) $\rightarrow$ occupied spot
-			\item[] (1, 0) $\rightarrow$ empty spot
+			\item[] (Learning rate: 0.0001)
+			\item[] \textbf{Input layer:} reads in 128-by-128 color images of 
+			parking spots.
+			\item[] \textbf{Convolutional layer 1:} applies 64 5-by-5 filters, 
+			and 
+			then the 
+			scaled exponential linear unit (SeLU) activation function 
+			\footnote{Using SeLU was found to lead to the fastest-learning CNN, 
+			reiterating past results: \cite{selu-motivation}\relax.}.
+			\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+			\item[] \textbf{Pooling layer 1:} performs max pooling with a 
+			2-by-2 
+			filter.
+			\item[] \textbf{Convolutional layer 2:} applies 128 3-by-3 filters, 
+			and 
+			then the 
+			SeLU activation function.
+			\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+			\item[] \textbf{Pooling layer 2:} performs max pooling with a 
+			2-by-2 
+			filter.
+			\item[] \textbf{Convolutional layer 3:} applies 256 3-by-3 filters, 
+			and 
+			then the 
+			SeLU activation function.
+			\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+			\item[] \textbf{Pooling layer 3:} performs max pooling with a 
+			2-by-2 
+			filter.
+			\item[] \textbf{Convolutional layer 4:} applies 512 3-by-3 filters, 
+			and 
+			then the 
+			SeLU activation function.
+			\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+			\item[] \textbf{Pooling layer 4:} performs max pooling with a 
+			2-by-2 
+			filter.
+			\item[] \textbf{Convolutional layer 5:} applies 1024 3-by-3 
+			filters, 
+			and then 
+			the SeLU activation function.
+			\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+			\item[] \textbf{Pooling layer 5:} performs max pooling with a 
+			2-by-2 
+			filter.
+			\item[] \textbf{Convolutional layer 6:} applies 2048 1-by-1 
+			filters, 
+			and then 
+			the SeLU activation function.
+			\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+			\item[] \textbf{Pooling layer 6:} performs max pooling with a 
+			2-by-2 
+			filter.
+			\item[] \textbf{Fully-connected layer 1:} comprises of 2048 neurons.
+			\item[] \textbf{Dropout} is applied with a keep probability of 0.90.
+			\item[] \textbf{Output layer:} comprises of 2 neurons, representing 
+			the 
+			output 
+			vector.
+			\vspace*{-4mm}
+			\begin{enumerate}
+				\setlength\itemsep{-3mm}
+				\item[] (0, 1) $\rightarrow$ occupied spot
+				\item[] (1, 0) $\rightarrow$ empty spot
+			\end{enumerate}
+		\end{itemize}
+		This network, trained over 20 epochs, has a testing accuracy of 99.9\%, 
+		a specificity of about 1, and a
+		sensitivity of 0.998. This translates to the following confusion matrix:
+		\begin{equation}
+		\nonumber
+		\begin{pmatrix} 43348 & 1\\ 3 & 1648 \end{pmatrix}
+		\end{equation}
+		\newpage
+		\hspace*{-6mm}where the element at (0, 1), for example, represents the 
+		number of 
+		false 
+		positives. It is heartening to note that network ``learned around`` the 
+		large number of instances of occlusion in this dataset:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=2cm]{figures/nuslot_occlusion}
+			\caption{One of the many instances of occlusion that the network 
+			correctly classified as ``empty''.}
+		\end{figure}
+		\hspace*{-6mm}These findings reiterate what was found in ST2288: CNNs 
+		are 
+		effective for 
+		this binary classification task, likely due to the low intra-class 
+		and high inter-class variation between examples.
+	\subsection{Functionalities of this implementation}
+		What is more significant is the TensorFlow implementation 
+		of 
+		this CNN and its
+		extensibility; most readily-available implementations of CNNs tend to 
+		not 
+		be so\footnote{Consider the canonical
+		\hyperlink{https://github.com/aymericdamien/TensorFlow-Examples}
+		{github.com/aymericdamien/TensorFlow-Examples} and 
+		\hyperlink{https://www.tensorflow.org/versions/r1.0/get\_started/mnist/pros}
+		{tensorflow.org/versions/r1.0/get\_started/mnist/pros}}:
+		\begin{enumerate}
+			\item Automatic data management:
+			\item Dynamic scaling of network depth:
+			\item Ability to write evaluation mistakes to disk: 
+			entitled\_24\_t-1\_p-0
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=2cm]{figures/mistake_example}
+				\caption{One of the three examples falsely-classified as 
+				negative.}
+			\end{figure}
+			\item Seamless model saving and restoration options:
+			\item Dropout more options: \cite{dropout}\relax 
 		\end{enumerate}
-	\end{itemize}
-	This network, trained over 20 epochs, has a testing accuracy of 99.9\%, a specificity of about 1, and a
-	sensitivity of 0.998. This translates to the following confusion matrix:
-	\begin{equation}
-	\nonumber
-	\begin{pmatrix} 43348 & 1\\ 3 & 1648 \end{pmatrix}
-	\end{equation}
-	where the element at (0, 1), for example, represents the number of false 
-	positives. It is heartening to note that network ``learned around`` the 
-	large number of instances of occlusion in this dataset.
-	\begin{figure}
-		\centering
-		\includegraphics[width=2cm]{figures/nuslot_occlusion}
-		\caption{One of the many instances of occlusion that the network 
-		correctly classified as ``empty''.}
-	\end{figure}
-	These findings reiterate what was found in ST2288: CNNs are effective for 
-	this binary classification task, likely due to the low intra-class 
-	variation and high inter-class variation between examples.
-
-	\hspace*{-6mm}What is more significant is the TensorFlow implementation of 
-	this CNN and its
-	extensibility; most readily-available implementations of CNNs tend to not 
-	be so \footnote{Consider the canonical
-	\hyperlink{https://github.com/aymericdamien/TensorFlow-Examples}
-	{github.com/aymericdamien/TensorFlow-Examples} and 
-	\hyperlink{https://www.tensorflow.org/versions/r1.0/get\_started/mnist/pros}
-	{tensorflow.org/versions/r1.0/get\_started/mnist/pros}}:
-	\begin{enumerate}
-		\item Automatic data management:
-		\item Dynamic scaling of network depth:
-		\item Ability to write evaluation mistakes to disk: 
-		entitled\_24\_t-1\_p-0
-		\begin{figure}[H]
-			\centering
-			\includegraphics[width=2cm]{figures/mistake_example}
-			\caption{lalala}
-		\end{figure}
-		\item Seamless model saving and restoration options:
-		\item Dropout more options: \cite{dropout}\relax 
-	\end{enumerate}
-	Apart from these more novel features, it also contains the following 
-	functionality:
-	\begin{enumerate}
-		\item Integration with Tensorboard, a visualization suite for 
-		TensorFlow: Tensorboard dynamically shows things. Also say you can 
-		control summary frequency.
-		\begin{figure}[H]
-			\centering
-			\includegraphics[height=5cm]{figures/tb_acc_loss}
-			\caption{lalala}
-		\end{figure}
-		\begin{figure}[H]
-			\centering
-			\includegraphics[height=3cm]{figures/tb_graph_2}
-			\caption{lalala}
-		\end{figure}
-		\begin{figure}[H]
-			\centering
-			\includegraphics[height=7.8cm]{figures/tb_graph_1}
-			\caption{lalala}
-		\end{figure}
-		\item End-user encapsulation from adjustment of hyperparameters, 
-		activation function and choices: \cite{selu-motivation} \footnote{See 
-		\hyperlink{https://github.com/shaohua0116/Activation-Visualization-Histogram}
-			{github.com/shaohua0116/Activation-Visualization-Histogram}}
-		\item Enhanced evaluation metrics:
-		\begin{figure}[H]
-			\centering
-			\includegraphics[height=5cm]{figures/floydhub_results_example}
-			\caption{lalala}
-		\end{figure}
-	\end{enumerate}
-	Thus, this user-friendly implementation of a CNN on TensorFlow is yet 
-	another 
+		Apart from these more novel features, it also contains the following 
+		functionality:
+		\begin{enumerate}
+			\item Integration with TensorBoard, a visualization suite for 
+			TensorFlow: TensorBoard dynamically shows things. Also say you can 
+			control summary frequency.
+			\begin{figure}[H]
+				\centering
+				\includegraphics[height=5cm]{figures/tb_acc_loss}
+				\caption{Comparison of two runs: one with SeLU activation, and 
+				the other with leaky ReLU: the former leads to a slightly 
+				higher 
+				learning rate.}
+			\end{figure}
+			\begin{figure}[H]
+				\centering
+				\includegraphics[height=3cm]{figures/tb_graph_1}
+				\caption{Graph of the first convolutional layer.}
+			\end{figure}
+			\begin{figure}[H]
+				\centering
+				\includegraphics[height=7.8cm]{figures/tb_graph_2}
+				\caption{The tail-end of the complete computational graph.}
+			\end{figure}
+			\item End-user encapsulation from adjustment of hyperparameters, 
+			activation function and choices: \cite{selu-motivation} 
+			\footnote{See 
+			\hyperlink{https://github.com/shaohua0116/Activation-Visualization-Histogram}
+				{github.com/shaohua0116/Activation-Visualization-Histogram}}
+			\item Enhanced evaluation metrics:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[height=7cm]{figures/floydhub_results_example}
+				\caption{Truncated display of training metrics at the end of 
+				training and validation, with final validation accuracy 
+				calculated across all three splits.}
+			\end{figure}
+		\end{enumerate}
+		Thus, this user-friendly implementation of a CNN on TensorFlow is yet 
+		another 
 
 \section{Conclusion}
 	Also bring up the problem that realize that even with this vantage the 
