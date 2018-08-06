@@ -308,11 +308,11 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\texttt{label\_examples/crop\_spots/daily\_cropper.sh} is called.
 			\item The script calls \texttt{label\_examples/crop\_spots/crop\_all\_spots.py}, which pipes
 			shell commands to obtain the image of each spot from each image to 
-			be cropped to
+			be cropped into
 			\texttt{label\_examples/crop\_spots/todo.sh}. These shell commands are calls to
 			\texttt{label\_examples/crop\_spots/crop.py}, which crops and saves 
 			the image of a specified spot from a
-			single image, given its cropping instructions.
+			single image, given the spot's cropping instructions.
 			\item \texttt{label\_examples/crop\_spots/todo.sh} is deleted.
 		\end{enumerate}
 		Thus, apart from manual determination of each spot's cropping 
@@ -326,7 +326,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\end{figure}
 
 	\subsection{Labeling of cropped images}
-		After cropping, the resulting images are to be transferred to
+		After cropping, the resulting images are transferred to
 		\texttt{label\_examples/la-} \texttt{bel\_spots/pictures\_to\_label/} 
 		for labeling, 
 		which is done using 
@@ -334,9 +334,10 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		script displays
 		each cropped image in sequence, prompting the user to type a label for each
 		one. In the case of this problem, labels were either ``0'' or ``1'',
-		depending on whether the spot was empty or occupied respectively. Once each
+		depending on whether the spot was empty or occupied (respectively). 
+		Once each
 		image has been labelled, labels are written to a \texttt{.csv} file
-		entitled by the date the images were taken. The following is an example of
+		entitled by the date the images were taken. The following is a visual of
 		the labeling process:\\
 		\begin{figure}[H]
 			\centering
@@ -344,37 +345,43 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\caption{The image of each spot is displayed in sequence.}
 		\end{figure}	
 	\subsection{Serialization of data}
-		After data collection, processing, and labeling was completed, the data was
-		ready to be serialized. Namely, all labels were stored in \texttt{data/labels/} and cropped
-		images in \texttt{data/cropped/}, \texttt{save\_dataset/serialize\_dataset.ipynb}
-		was used to process the images and labels into NumPy arrays before serialization
-		into \texttt{.hdf5} binary files.
+		After the data has been collected, processed, and labeled, it is 
+		converted into NumPy arrays and serialized using 
+		\texttt{save\_dataset/serialize\_dataset.ipynb}.
 		The following is the process:
 		\begin{enumerate}
-			\item All cropped images and labels are used to create the feature and label matrices
-			(respetively).
-			\item These matrices are split up randomly into the train and test sets, with the test
+			\item All available cropped images and labels are used to create 
+			the feature and label NumPy arrays.
+			\item These arrays are split up randomly into the train and test 
+			sets, with the test
 			set comprising of 10\% of the total number of examples at hand.
 			\item Mean-subtraction and normalization of the test set is 
-			conducted using the mean \cite{sub-norm}\relax
+			conducted using the mean
 			and standard deviation of the training set. The test set is then saved as a
-			\texttt{.hdf5} binary file in \texttt{data/hdf5/} as \texttt{test\_set.hdf5}.
+			HDF5 binary file in \texttt{data/hdf5/} as \texttt{test\_set.hdf5}.
 			\item The training set matrix is then split into train and validations sets three times,
 			to allow for stratified three-fold cross validation. For each split, the train and
 			validation sets are mean-subtracted and normalized using the mean of the corresponding
-			training set. Each split is then saved
-			\texttt{data/hdf5/train\_validation\_set\_{split\_number}.hdf5}, where
-			\texttt{split\_number} is one of 1, 2, or 3.
+			training set. This is done to help the CNN's gradient descent 
+			faster\cite{sub-norm}\relax. Each split is then saved
+			\texttt{data/hdf5/train\_val-} 
+			\texttt{idation\_set\_\{split\_number\}.hdf5}, 
+			where
+			\texttt{split\_number} is one of \texttt{1}, \texttt{2}, or 
+			\texttt{3}.
 		\end{enumerate}
-		Three splits were made instead of the more common five or ten because of memory constraints: each
-		split of the training set is 17.7 GB. Given that these scripts may be used to process other data,
-		\texttt{save\_data/serialize\_data.ipynb} has been designed to be able to create a variable number
-		of splits, and handle a variable number of classes and image types. (In fact, all aforementioned
-		scripts can also be applied to the general data-processing context.)
-		Also to note is that the third-part \texttt{h5py} module was used to serialize the data into
-		\texttt{.hdf5} files instead of the more commonly-used inbuilt \texttt{pickle} module since
-		the former module is far more memory-efficient for the serialization of 
-		numerical arrays \cite{hdf5-performance}\relax.
+		Three splits were made instead of the more common five or ten because 
+		of memory constraints: each split of the training set is 17.7 GB. Given 
+		that these scripts may be used to process other data, 
+		\texttt{save\_data/serialize\_data.ipynb} has been designed to be able 
+		to create a variable number of splits, and handle a variable number of 
+		classes and image types. (In fact, all aforementioned scripts can also 
+		be applied to the general data-processing context.) Also to note is 
+		that the third-part \texttt{h5py} module was used to serialize the data 
+		into HDF5 files instead of the more commonly-used inbuilt 
+		\texttt{pickle} module since the former module is far more 
+		RAM-efficient for the serialization of arrays 
+		\cite{hdf5-performance}\relax.
 
 	\subsection{Culmination}
 		After the completion of the above, the dataset was ready to use for machine learning purposes. It
@@ -511,6 +518,9 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	another 
 
 \section{Conclusion}
+	Also bring up the problem that realize that even with this vantage the 
+	trees stopped me from doing some spots. And if we are too low occlusion 
+	gets undeniably bad -- completely blocking.
 	This project was carried out with the intention to explore the practicality 
 	and effectiveness of the use of CNNs to ascertain the occupancy status a 
 	parking lot given pictures of it. Fortunately, performance on both an 
@@ -551,14 +561,14 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		Almeida, P. R., Oliveira, L. S., Britto, A. S., Silva, E. J., \& Koerich, A. L. (2015). PKLot--A robust 
 		dataset for parking lot classification. \textit{Expert Systems with Applications}, 42(11), 
 		4937-4949. doi:10.1016/j.eswa.2015.02.009
-	\bibitem{sub-norm}
-		CS231n Convolutional Neural Networks for Visual Recognition: Setting up 
-		the data and the model. (n.d.). Retrieved August 6, 2018, from 
-		http://cs231n.github.io/neural-networks-2/	
 	\bibitem{hdf5-performance}
 		Finch, C. (2010, January 10). Storing large Numpy arrays on disk: 
 		Python Pickle vs. HDF5 [Web log post]. Retrieved August 6, 2018, from 
 		https://shocksolution.com/2010/01/10/storing-large-numpy-arrays-on-disk-python-pickle-vs-hdf5adsf/
+	\bibitem{sub-norm}
+		Ioffe, S., \& Christian, S. (2015). Batch Normalization: Accelerating 
+		Deep Network Training by Reducing Internal Covariate Shift. 
+		doi:arXiv:1502.03167
 	\bibitem{selu-motivation}
 		Pedamonti, D. (2018). Comparison of non-linear activation functions for 
 		deep neural networks on MNIST classification task. Retrieved August 6, 
