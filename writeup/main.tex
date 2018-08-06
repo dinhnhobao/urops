@@ -75,28 +75,32 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 \newpage
 
 \section{Summary}
-    This report discusses the conclusion of the two-semester UROPS project entitled ``Parking Lot
-    Classification''; namely, it details the suite of tools developed and results achieved in the effort to use
+    This report details the two-semester UROPS project entitled ``Parking Lot
+    Classification''; namely, it describes the suite of tools developed and 
+    results achieved in the effort to use
     convolutional neural networks (CNNs) to ascertain the state of a parking lot given its picture. The 
-    report will briefly recount the first semester's results, and intentions before delving into how these 
-    motivations developed in the second.
-\newpage
-\section{Recount of ST2288: ``Parking Lot Classification''}
-	The motivation behind investigating the use of CNNs in this task was to determine whether it was 
+    report will briefly recount the first semester's results and intentions 
+    before delving into their development in the second. It will conclude with 
+    an evaluation of the soundness of using CNNs to report parking lot 
+    occupancy in the practical context.
+\section{Recount of ST2288}
+	The motivation behind investigating the use of CNNs for this task was to 
+	determine whether it was 
 	possible to reliably and inexpensively increase the resolution of information available to drivers 
-	looking for parking space; in Singapore, most public parking lots provide users with the number of 
-	spots left, but not \textit{where} such spots are. When parking is scarce, traversal to find free spots 
+	looking for parking space; in Singapore, most public parking lots provide 
+	users with information on the \textit{number} of 
+	spots left, but do not tell them \textit{where} empty spots are. When 
+	parking is scarce, traversal to find free spots 
 	can be a great inconvenience. Thus, an Internet-of-Things idea based on the usage of 
 	already-installed CCTV cameras was proposed to be tested:
 	\begin{center}
 		\textbf{
 			how can one use the \textit{image} of a parking lot to determine its spot-wise occupancy, and 
-			then deliver this information to users, in real-time?
-		}
+			then deliver this information to users, in real-time?}
 	\end{center}
 	CNNs were selected to be the classification model behind this idea's implementation since they are 
-	currently state-of-the-art for many computer vision tasks.
-	The  following was the proposed workflow of a system based on this idea: 
+	currently state-of-the-art for image classification tasks.\\
+	The following is a possible workflow of a system based on this idea: 
 	\begin{enumerate}
 		\item User requests for spot-wise occupancy status of a given parking lot through a mobile 
 		application created to handle such requests in real-time.
@@ -104,22 +108,25 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		the associated cloud-based CNN.
 		\item Each spot in the parking lot is classified by this CNN as either empty or occupied.
 		\item The picture is then deleted, and the is user sent a spatially-accurate abstraction of 
-		spot-wise occupancy status (possibly in the manner pictured below).
+		spot-wise occupancy status, possibly in the manner pictured below.
 	\end{enumerate}
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=8cm]{figures/mock-up.jpg}
 		\caption{This visual could be delivered to users through the mobile application.}
 	\end{figure}
-	The focus of the previous semester's work was solely the third step of the above workflow: to 
+	The focus of work in ST2288 was solely on the third step of 
+	the above workflow: to 
 	explore and determine the effectiveness of CNNs for this classification task. To this end, CNNs were 
-	found to work very well. A publicly-available parking lot image dataset, \textit{PKLot}, was used to 
-	train, validate, and test CNNs created\footnote{This dataset can be found at: 
-	\hyperlink{https://web.inf.ufpr.br/vri/databases/parking-lot-database/}
-	{web.inf.ufpr.br/vri/databases/parking-lot-database/}}. It comprises of 695,899 images of 
-	parking spots taken from two parking lots over the course of about 30 days, in which there was 
-	great variation of weather and illumination \cite{pklot-paper}\relax. The following are three example 
-	images from this dataset:
+	found to work very well. A publicly-available parking lot image dataset, 
+	\textit{PKLot}\footnote{This dataset can be found at: 
+		\hyperlink{https://web.inf.ufpr.br/vri/databases/parking-lot-database/}
+		{web.inf.ufpr.br/vri/databases/parking-lot-database/}}, was used to 
+	train, validate, and test CNNs created. It comprises of 695,899 images of 
+	parking \textbf{spots} taken from two parking lots over the course of about 
+	30 days, in which there was 
+	great variation of weather and illumination \cite{pklot-paper}\relax. The 
+	following are three examples from this dataset:
 	\vskip 5mm
 	\begin{figure}[H]
 		\centering
@@ -132,11 +139,14 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\caption{An empty spot from one angle of the second parking lot, in overcast conditions.}
 		\vspace{5mm}
 		\includegraphics[width=1cm]{figures/pklot_example_3.jpg}
-		\caption{An occupied spot from the second angle of the second parking lot, in rain.}
+		\caption{An occupied spot from the second angle of the second parking 
+		lot, in the rain.}
 	\end{figure}
 	\hspace*{-6mm}The testing accuracies of the CNNs created for each lot in this dataset were greater 
 	than 99.8\%, which translates to the misclassification of about 260 spots in requesting for the 
-	prediction of the state of about 175,000.The following was their architecture:
+	prediction of the state of about 175,000. The following was the CNNs' 
+	common architecture:
+	\newpage
 	\begin{itemize}
 		\setlength\itemsep{-3mm}
 		\item[] (Learning rate: 0.001)
@@ -148,7 +158,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		ReLU activation function.
 		\item[] Pooling layer 2: performs max pooling with a 2-by-2 filter.
 		\item[] Fully-connected layer 1: comprises of 1,024 neurons.
-		\item[] Output layer: 2 neurons, representing the output vector.
+		\item[] Output layer: comprises of 2 neurons, representing the output 
+		vector.
 		\vspace*{-4mm}
 		\begin{enumerate}
 			\setlength\itemsep{-3mm}
@@ -158,11 +169,15 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	\end{itemize}
    	The CNNs were implemented using 
    	\href{https://www.tensorflow.org}{TensorFlow}, an efficient and 
-   	well-supported deep-learning library written for the Python programming language. Training and 
-   	testing of the CNNs was done online on \href{https://www.floydhub.com}{FloydHub}. FloydHub is a 
+   	well-supported deep-learning library written for the Python programming 
+   	language. Their training and 
+   	evaluation was done online on 
+   	\href{https://www.floydhub.com}{FloydHub}. FloydHub is a 
    	Platform-as-a-Service that quite inexpensively offers a pre-configured programming environment on 
-   	powerful hardware for machine learning purposes. Users run ``jobs'' through a command-line client, 
-   	with data and algorithms stored on FloydHub. Training metrics and logs can also be automatically 
+   	powerful hardware for machine learning purposes. Users run ``jobs'' through 
+   	a command-line client, 
+   	with data and algorithms stored on FloydHub. Training metrics and logs can 
+   	be automatically 
     generated:
     \vskip 5mm
     \begin{figure}[H]
@@ -170,14 +185,13 @@ Applying machine learning techniques to determine the occupancy of parking lots}
     	\includegraphics[width=14cm]{figures/floydhub.png}
     	\caption{Log of jobs run on FloydHub.}
     \end{figure}
-	\newpage
 	With the above results and tools, ST2288 was concluded. This left trialling of the practical 
-	application of this idea in the local context to ST3288. The rest of this report details the unique 
-	challenges involved in the creation and management of original data, the tools created in response, 
-	and the deep generalizability of the resulting CNN-creation workflow to other machine learning 
-	projects. The algorithms and files referred to in this report are as they are found on  
+	application of this idea in the local context to ST3288. The rest of this 
+	report details the tools created in response to the challenges involved in 
+	the creation and management of original data and the readily-extensible 
+	CNN implementation developed. The files referred to in the rest of this 
+	report are as they appear on 
 	\hyperlink{https://github.com/nurmister/urops}{github.com/nurmister/urops}.
-\newpage
 \section{Creation of \textit{NUSLot}}
 	\subsection{Collection schedule and setup}
 		\textit{NUSLot} is the culmination of the data collection, processing, and labeling efforts of this 
@@ -267,7 +281,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.75\textwidth]{figures/spot_coord_demo}
-			\caption{An example-attempt to obtain the right angle and coordinates to crop images for spot 18.}
+			\caption{An example-attempt to obtain the right angle and 
+			coordinates to crop images for spot 19.}
 		\end{figure}
 		This tool was used to get cropping instructions for each spot. These instructions are stored in
 		\texttt{label\_examples/crop\_spots/crop\_instructions.csv}. They are 
@@ -356,7 +371,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\item \texttt{full\_dataset} comprises of serialized NumPy arrays 
 			representing
 			training, validation, and testing sets created from all 50,000 examples. 
-			\item \texttt{toy\_dataset}, is a 10\% simple random sample of the 
+			\item \texttt{toy\_dataset} is a 10\% simple random sample of the 
 			data of
 			\texttt{full\_dataset}.
 		\end{enumerate}
@@ -395,7 +410,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\item[] Pooling layer 6: performs max pooling with a 2-by-2 filter.
 		\item[] Fully-connected layer 1: comprises of 2048 neurons.
 		\item[] Dropout is applied with a keep probability of 0.90.
-		\item[] Output layer: 2 neurons, representing the output vector.
+		\item[] Output layer: comprises of 2 neurons, representing the output 
+		vector.
 		\vspace*{-4mm}
 		\begin{enumerate}
 			\setlength\itemsep{-3mm}
@@ -404,18 +420,23 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\end{enumerate}
 	\end{itemize}
 	This network, trained over 20 epochs, has a testing accuracy of 99.9\%, a specificity of about 1, and a
-	sensitivity of 0.998. As found in ST2288, CNNs are effective for this 
-	binary classification task. talk about actual numbers then talk about 
-	occlusion -- use the confusion matrix.
-	Actually, bring up the occlusion problem here, and talk about specificity 
-	so good that occlusion was not an issue, and show a picture of an occluded 
-	spot here.
+	sensitivity of 0.998. This translates to the following confusion matrix:
+	\begin{equation}
+	\begin{pmatrix} 43348 & 1\\ 3 & 1648 \end{pmatrix}
+	\end{equation}
+	where the element at (0, 1), for example, represents the number of false 
+	positives. It is heartening to note that network ``learned around`` the 
+	large number of instances of occlusion in this dataset.
 	\begin{figure}
 		\centering
 		\includegraphics[width=2cm]{figures/nuslot_occlusion}
-		\caption{One of the many instances of occlusion that it was not 
-		bothered by}
+		\caption{One of the many instances of occlusion that the network 
+		correctly classified as ``empty''.}
 	\end{figure}
+	These findings reiterate what was found in ST2288: CNNs are effective for 
+	this binary classification task. 
+
+	
 
 	What is more significant is the implementation of this CNN is its 
 	extensibility; most readily-available implementations of CNNs tend to not 
@@ -503,7 +524,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	resolution of information available to those seeking a parking spot is not the
 	only implication of this project, especially given that NUS' parking lots are
 	organized appropriately for demand. Rather, we truly view this project as a
-	capability-building exercise; a segue into greater problems that can be
+	capability-building exercise; a segue into greater problems that c n be
 	addressed by machine learning--either by us or those who take reference to our
 	experiences in the future.
 
