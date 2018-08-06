@@ -220,8 +220,8 @@ def write_mistake(mistake_image, true_vs_predicted, curr_split_num, mistake_num)
     base_path = f'mistake_images/{start_dt}_{curr_split_num}'
     os.system('if [ ! -d "mistake_images" ]; then mkdir mistake_images; fi;')
     os.system(f'if [ ! -d "{base_path}" ]; then mkdir {base_path}; fi;')
-    cv2.imwrite((f'{base_path}/{mistake_num}_t:{int(true_vs_predicted[0])}_'
-                f'p:{int(true_vs_predicted[1])}.jpg'),
+    cv2.imwrite((f'{base_path}/{mistake_num}_t-{int(true_vs_predicted[0])}_'
+                f'p-{int(true_vs_predicted[1])}.jpg'),
                 mistake_image)
 
 
@@ -270,7 +270,7 @@ if not FLAGS.do_test:
                                     f'{FLAGS.restore_model}'))
             print()
             print(f'Training and validation on split {curr_split_num}.')
-            print('-' * 60)
+            print('-' * 62)
             summary_writer = tf.summary.FileWriter((f'./tensorboard_log/'
                                                     f'validation_mode/{start_dt}'
                                                     f'_split_{curr_split_num}'),
@@ -305,7 +305,7 @@ if not FLAGS.do_test:
                 print((f'Epoch {epoch} | '
                        f'training loss: {batch_loss: .5f}, '
                        f'training accuracy: {batch_accuracy: .5f}.'))
-            print('-' * 60)
+            print('-' * 62)
             if FLAGS.save_model:
                 save_path = save_model.save(sess,
                                             (f'model_checkpoints/{start_dt}'
@@ -352,16 +352,16 @@ if not FLAGS.do_test:
             if (num_classes == 2):
                 print(f'Specificity: {get_specificity(confusion_matrix): .5f}')
                 print(f'Sensitivity: {get_sensitivity(confusion_matrix): .5f}')
-            print('-' * 60)
+            print('-' * 62)
             print()
             validation_accuracies.append(overall_accuracy)
             summary_writer.close()
-    print('-' * 60)
+    print('-' * 62)
     print(f'Validation accuracy (K = {num_splits}):')
     print(f'Mean: {np.mean(validation_accuracies): .5f}')
     print(f'Median: {np.median(validation_accuracies): .5f}')
     print(f'Standard deviation: {np.std(validation_accuracies): .5f}')
-    print('-' * 60)
+    print('-' * 62)
 else:
     test_set = h5py.File(f'{base_path}/test_set.hdf5', 'r')
     test_X, test_y = test_set['test_X'], test_set['test_y']
@@ -385,7 +385,7 @@ else:
                                                sess.graph)
         print()
         print('Training and testing on complete dataset.')
-        print('-' * 60)
+        print('-' * 62)
         summary_counter = 0
         for epoch in range(1, (num_epochs + 1)):
             for batch in range(len(train_X) // batch_size):
@@ -416,7 +416,7 @@ else:
             print((f'Epoch {epoch} | '
                    f'training loss: {batch_loss: .5f}, '
                    f'training accuracy: {batch_accuracy: .5f}.'))
-        print('-' * 60)
+        print('-' * 62)
         if FLAGS.save_model:
                 save_path = save_model.save(sess,
                                             f'model_checkpoints/{start_dt}_t')
@@ -461,7 +461,7 @@ else:
         if (num_classes == 2):
             print(f'Specificity: {get_specificity(confusion_matrix): .5f}')
             print(f'Sensitivity: {get_sensitivity(confusion_matrix): .5f}')
-        print('-' * 60)
+        print('-' * 62)
         summary_writer.close()
 print()
 

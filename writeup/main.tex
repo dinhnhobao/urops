@@ -138,14 +138,16 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	than 99.8\%, which translates to the misclassification of about 260 spots in requesting for the 
 	prediction of the state of about 175,000.The following was their architecture:
 	\begin{itemize}
-		\item[] An input layer which reads in 32-by-32 color images of parking spots.
-		\item[] Convolutional layer 1: applies 32 5-by-5 filters, and then applies the ReLU activation 
-		function.
+		\setlength\itemsep{-3mm}
+		\item[] (Learning rate: 0.001)
+		\item[] Input layer: reads in 32-by-32 color images of parking spots.
+		\item[] Convolutional layer 1: applies 32 5-by-5 filters, and then the 
+		rectified exponential linear unit (ReLU) activation function.
 		\item[] Pooling layer 1: performs max pooling with a 2-by-2 filter.
-		\item[] Convolutional layer 2: applies 64 3-by-3 filters, and then applies the ReLU activation 
-		function.
+		\item[] Convolutional layer 2: applies 64 3-by-3 filters, and then the 
+		ReLU activation function.
 		\item[] Pooling layer 2: performs max pooling with a 2-by-2 filter.
-		\item[] Fully-connected layer 1: comprises of 1,024 neurons/predictors.
+		\item[] Fully-connected layer 1: comprises of 1,024 neurons.
 		\item[] Output layer: 2 neurons, representing the output vector.
 		\vspace*{-4mm}
 		\begin{enumerate}
@@ -154,7 +156,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\item[] (1, 0) $\rightarrow$ empty spot
 		\end{enumerate}
 	\end{itemize}
-   	The CNNs were implemented using \href{https://www.tensorflow.org}{TensorFlow}, an efficient and 
+   	The CNNs were implemented using 
+   	\href{https://www.tensorflow.org}{TensorFlow}, an efficient and 
    	well-supported deep-learning library written for the Python programming language. Training and 
    	testing of the CNNs was done online on \href{https://www.floydhub.com}{FloydHub}. FloydHub is a 
    	Platform-as-a-Service that quite inexpensively offers a pre-configured programming environment on 
@@ -356,6 +359,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	allow for greater extensibility and functionality, which will be described in this section. Firstly, however,
 	a description of the architecture and hyperparameters of the CNN used for this classification problem:
 	\begin{itemize}
+		\setlength\itemsep{-3mm}
 		\item[] (Learning rate: 0.0001)
 		\item[] Input layer: reads in 128-by-128 color images of parking spots.
 		\item[] Convolutional layer 1: applies 64 5-by-5 filters, and then the 
@@ -380,9 +384,10 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\item[] Pooling layer 5: performs max pooling with a 2-by-2 filter.
 		\item[] Convolutional layer 6: applies 2048 1-by-1 filters, and then 
 		the SeLU activation function.
-		\item Dropout is applied with a keep probability of 0.95.
+		\item[] Dropout is applied with a keep probability of 0.95.
 		\item[] Pooling layer 6: performs max pooling with a 2-by-2 filter.
 		\item[] Fully-connected layer 1: comprises of 2048 neurons.
+		\item[] Dropout is applied with a keep probability of 0.90.
 		\item[] Output layer: 2 neurons, representing the output vector.
 		\vspace*{-4mm}
 		\begin{enumerate}
@@ -392,9 +397,46 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\end{enumerate}
 	\end{itemize}
 	This network, trained over 20 epochs, has a testing accuracy of 99.9\%, a specificity of about 1, and a
-	sensitivity of 0.998. As found in ST2288, CNNs are effective for this binary classification task.	
+	sensitivity of 0.998. As found in ST2288, CNNs are effective for this 
+	binary classification task.
+	Actually, bring up the occlusion problem here, and talk about specificity 
+	so good that occlusion was not an issue, and show a picture of an occluded 
+	spot here.
 
-\section{Conclusion and extensions}
+	What is more significant is the implementation of this CNN is its 
+	extensibility; most readily-available implementations of CNNs tend to not 
+	be so (see ``these links''):
+	\begin{enumerate}
+		\item Automatic data management:
+		\item Dynamic scaling of network depth:
+		\item Ability to write evaluation mistakes to disk:
+		\item Seamless model saving and restoration options:
+	\end{enumerate}
+	Apart from these more novel features, it also contains the following 
+	functionality:
+	\begin{enumerate}
+		\item Integration with Tensorboard, a visualization suite for 
+		Tensorflow: Tensorboard dynamically shows things. Also say you can 
+		control summary frequency.
+		\item End-user encapsulation from adjustment of hyperparameters, 
+		activation function and choices:
+		\item Enhanced evaluation metrics:
+	\end{enumerate}
+	Thus, this user-friendly implementation of a CNN on Tensorflow is yet 
+	another 
+
+\section{Conclusion}
+	This project was carried out with the intention to explore the practicality 
+	and effectiveness of the use of CNNs to ascertain the occupancy status a 
+	parking lot given pictures of it. Fortunately, performance on both an 
+	external and locally-sourced dataset was extremely good. However, and 
+	surprisingly, there are significant practical challenges to the setting-up 
+	of picture-taking hardware. Some of 
+	
+	the intricacies and challenged involved in the process of 
+
+
+
 	Tell them your honest criticisms of it here, and how you learned that things
 	might not be suitable.
 	Also talk about how there is a standard way to learn about this stuff, but
