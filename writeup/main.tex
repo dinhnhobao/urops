@@ -336,7 +336,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		one. In the case of this problem, labels were either ``0'' or ``1'',
 		depending on whether the spot was empty or occupied (respectively). 
 		Once each
-		image has been labelled, labels are written to a \texttt{.csv} file
+		image has been labeled, labels are written to a CSV file
 		entitled by the date the images were taken. The following is a visual of
 		the labeling process:\\
 		\begin{figure}[H]
@@ -352,22 +352,24 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\begin{enumerate}
 			\item All available cropped images and labels are used to create 
 			the feature and label NumPy arrays.
-			\item These arrays are split up randomly into the train and test 
-			sets, with the test
-			set comprising of 10\% of the total number of examples at hand.
+			\item The set of examples is split up randomly into training 
+			and test sets, with the test set comprising of 10\% of the total 
+			number of examples at hand.
 			\item Mean-subtraction and normalization of the test set is 
-			conducted using the mean
-			and standard deviation of the training set. The test set is then saved as a
-			HDF5 binary file in \texttt{data/hdf5/} as \texttt{test\_set.hdf5}.
-			\item The training set matrix is then split into train and validations sets three times,
-			to allow for stratified three-fold cross validation. For each split, the train and
-			validation sets are mean-subtracted and normalized using the mean of the corresponding
-			training set. This is done to help the CNN's gradient descent 
-			faster\cite{sub-norm}\relax. Each split is then saved
-			\texttt{data/hdf5/train\_val-} 
-			\texttt{idation\_set\_\{split\_number\}.hdf5}, 
-			where
-			\texttt{split\_number} is one of \texttt{1}, \texttt{2}, or 
+			conducted using the mean and standard deviation of the training 
+			set. The test set is then saved as a HDF5 file in 
+			\texttt{data/hdf5/} as \texttt{test\_set.hdf5}.
+			\item The training set is then further split into training and 
+			validation sets three times in a \textbf{shuffled, stratified} 
+			manner to allow for three-fold cross validation. For each split, 
+			the training and validation sets are mean-subtracted and normalized 
+			using the mean and standard deviation of the training set. This is 
+			done to help the CNN's gradient descent converge faster 
+			\cite{sub-norm}\relax. Each split is then saved to
+			\texttt{data/hdf5/} as 
+			\texttt{train\_validation\_set\_\{split\_numb-} \texttt{er\}.hdf5}, 
+			where 
+			\texttt{split\_number} is either \texttt{1}, \texttt{2}, or 
 			\texttt{3}.
 		\end{enumerate}
 		Three splits were made instead of the more common five or ten because 
@@ -375,22 +377,25 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		that these scripts may be used to process other data, 
 		\texttt{save\_data/serialize\_data.ipynb} has been designed to be able 
 		to create a variable number of splits, and handle a variable number of 
-		classes and image types. (In fact, all aforementioned scripts can also 
-		be applied to the general data-processing context.) Also to note is 
-		that the third-part \texttt{h5py} module was used to serialize the data 
-		into HDF5 files instead of the more commonly-used inbuilt 
-		\texttt{pickle} module since the former module is far more 
-		RAM-efficient for the serialization of arrays 
-		\cite{hdf5-performance}\relax.
+		label classes and image types. (In fact, all aforementioned scripts can 
+		also 
+		be used for general data-processing, given minor configuration for the 
+		specific data at hand.) Also to note is that the third-part 
+		\texttt{h5py} module was used to serialize the data into HDF5 files 
+		instead of the more commonly-used inbuilt \texttt{pickle} module since 
+		the former is far more RAM-efficient in the serialization of 
+		arrays \cite{hdf5-performance}\relax.
 
 	\subsection{Culmination}
-		After the completion of the above, the dataset was ready to use for machine learning purposes. It
-		has been uploaded to Google Drive as \texttt{NUSLot}
-		\hyperlink{https://goo.gl/fV2NXS}{goo.gl/fV2NXS}, and comprises of 
-		three sub-directories:
+		After the completion of the above, the dataset is ready to use for 
+		machine learning purposes. It
+		has been uploaded to Google Drive as \texttt{NUSLot}\footnote{It can be 
+		downloaded from \hyperlink{https://goo.gl/fV2NXS}{goo.gl/fV2NXS}.}, and 
+		comprises of 
+		three directories:
 		\begin{enumerate}
-			\item \texttt{raw\_data} comprises of ``complete'' parking lot images, cropped images of
-			individual spots, and all label \texttt{.csv} files.
+			\item \texttt{raw\_data} comprises of the complete parking lot 
+			images, cropped images of individual spots, and all label CSV files.
 			\item \texttt{full\_dataset} comprises of serialized NumPy arrays 
 			representing
 			training, validation, and testing sets created from all 50,000 examples. 
@@ -400,7 +405,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\end{enumerate}
 
 \section{Implementation of the CNN}
-	The CNN was implemented on Tensorflow version 1.9. It was created using this library's low-level API to
+	The CNN was implemented on TensorFlow version 1.9. It was created using 
+	this library's low-level API to
 	allow for greater extensibility and functionality, which will be described in this section. Firstly, however,
 	a description of the architecture and hyperparameters of the CNN used for this classification problem:
 	\begin{itemize}
@@ -460,9 +466,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	These findings reiterate what was found in ST2288: CNNs are effective for 
 	this binary classification task. 
 
-	
-
-	What is more significant is the implementation of this CNN is its 
+	\hspace*{-6mm}What is more significant is the TensorFlow implementation of 
+	this CNN and its
 	extensibility; most readily-available implementations of CNNs tend to not 
 	be so \footnote{Consider the canonical
 	\hyperlink{https://github.com/aymericdamien/TensorFlow-Examples}
@@ -486,7 +491,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	functionality:
 	\begin{enumerate}
 		\item Integration with Tensorboard, a visualization suite for 
-		Tensorflow: Tensorboard dynamically shows things. Also say you can 
+		TensorFlow: Tensorboard dynamically shows things. Also say you can 
 		control summary frequency.
 		\begin{figure}[H]
 			\centering
@@ -514,7 +519,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\caption{lalala}
 		\end{figure}
 	\end{enumerate}
-	Thus, this user-friendly implementation of a CNN on Tensorflow is yet 
+	Thus, this user-friendly implementation of a CNN on TensorFlow is yet 
 	another 
 
 \section{Conclusion}
