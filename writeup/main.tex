@@ -269,26 +269,28 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		one-time 
 		setup of 
 		\texttt{label\_examples/crop\_spots/crop\_instru-} \texttt{ctions.csv}. 
-		They are 
+		These instructions were 
 		used by
-		\texttt{label\_examples/crop\_spots/crop\_all\_spots.-} \texttt{py}, 
+		\texttt{label\_examples/crop\_spots/cro-} \texttt{p\_all\_spots.py}, 
 		which is 
 		itself called by
-		\texttt{label\_examples/crop\_spots/daily\_cropper.sh}. The latter 
+		\texttt{label\_examples/crop\_spots/daily\_-} \texttt{cropper.sh}. The 
+		latter 
 		script is 
 		what the end-user has to call to automatically
 		crop all images placed in \texttt{label\_examples/pictures\_dump}.
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.8\textwidth]{figures/spots_w_labels.png}
-			\caption{each spot in the parking lot was assigned an ID for 
+			\caption{Each spot in the parking lot was assigned an ID for 
 			cropping and file-naming purposes.}
 		\end{figure}
 		\hspace*{-6mm}For each spot, these cropping instructions were created 
 		using \texttt{label\_examples/} 
 		\texttt{crop\_spots/get\_spot\_coords\_and\_angles.py}.
 		This script accepts as flags
-		the path to an image and an angle to rotate the image (counter-clockwise) by. It then displays the
+		the path to an image and an angle to rotate the image counter-clockwise 
+		by. It then displays the
 		rotated image and allows users to click-and-drag green bounding boxes 
 		over it to ascertain the coordinates
 		of the region to crop the image to obtain a picture of the desired spot. It prints the coordinates of drawn
@@ -301,18 +303,21 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\end{figure}
 		\hspace*{-6mm}The following was thus the cropping workflow:
 		\begin{enumerate}
-			\item User places all images to be cropped in \texttt{label\_examples/pictures\_dump}, and calls
-			\texttt{label\_examples/crop\_spots/daily\_cropper.sh}. 
+			\item Images to be cropped are placed in 
+			\texttt{label\_examples/pictures\_dump}, and
+			\texttt{label\_examples/crop\_spots/daily\_cropper.sh} is called.
 			\item The script calls \texttt{label\_examples/crop\_spots/crop\_all\_spots.py}, which pipes
 			shell commands to obtain the image of each spot from each image to 
 			be cropped to
 			\texttt{label\_examples/crop\_spots/todo.sh}. These shell commands are calls to
-			\texttt{label\_examples/crop\_spots/crop.py}, which crops and saves a specified spot from a
+			\texttt{label\_examples/crop\_spots/crop.py}, which crops and saves 
+			the image of a specified spot from a
 			single image, given its cropping instructions.
 			\item \texttt{label\_examples/crop\_spots/todo.sh} is deleted.
 		\end{enumerate}
-		Thus, apart from manual determination of each spot's cropping instructions, the user is insulated from
-		the otherwise tedious cropping process.
+		Thus, apart from manual determination of each spot's cropping 
+		instructions, the user is insulated from the otherwise tedious cropping 
+		process.
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.8\textwidth]{figures/daily_cropper_example}
@@ -344,7 +349,6 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		images in \texttt{data/cropped/}, \texttt{save\_dataset/serialize\_dataset.ipynb}
 		was used to process the images and labels into NumPy arrays before serialization
 		into \texttt{.hdf5} binary files.
-		\newpage
 		The following is the process:
 		\begin{enumerate}
 			\item All cropped images and labels are used to create the feature and label matrices
