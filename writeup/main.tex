@@ -262,39 +262,50 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		vantage. The Raspberry Pi and battery packs were thus removed each 
 		evening and replaced the subsequent morning.
 	\subsection{Cropping of spots from complete images}
-		In the evenings, the pictures were cropped and labeled. The cropping process was 
-		fully automated	using the scripts of \texttt{label\_examples/crop\_spots/} 
-		following a one-time setup. 
-		Namely, each spot in the parking lot was assigned an ID for cropping and file-naming purposes:
+		The pictures the Raspberry Pi took were of the complete parking lot: 
+		thus, in the evenings, these pictures were cropped into images of 
+		individual spots. The cropping process was fully automated using the 
+		scripts of \texttt{label\_examples/crop\_s-} \texttt{pots/} following a 
+		one-time 
+		setup of 
+		\texttt{label\_examples/crop\_spots/crop\_instru-} \texttt{ctions.csv}. 
+		They are 
+		used by
+		\texttt{label\_examples/crop\_spots/crop\_all\_spots.-} \texttt{py}, 
+		which is 
+		itself called by
+		\texttt{label\_examples/crop\_spots/daily\_cropper.sh}. The latter 
+		script is 
+		what the end-user has to call to automatically
+		crop all images placed in \texttt{label\_examples/pictures\_dump}.
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.8\textwidth]{figures/spots_w_labels.png}
-			\caption{The spots and their IDs.}
+			\caption{each spot in the parking lot was assigned an ID for 
+			cropping and file-naming purposes.}
 		\end{figure}
-		For each spot, ``cropping instructions'' were created using\\
-		\texttt{label\_examples/crop\_spots/get\_spot\_coords\_and\_angles.py}. This script accepts as flags
+		\hspace*{-6mm}For each spot, these cropping instructions were created 
+		using \texttt{label\_examples/} 
+		\texttt{crop\_spots/get\_spot\_coords\_and\_angles.py}.
+		This script accepts as flags
 		the path to an image and an angle to rotate the image (counter-clockwise) by. It then displays the
-		rotated image and allows users to drag-and-click green bounding boxes over it to ascertain the coordinates
+		rotated image and allows users to click-and-drag green bounding boxes 
+		over it to ascertain the coordinates
 		of the region to crop the image to obtain a picture of the desired spot. It prints the coordinates of drawn
 		bounding boxes in the terminal from which the script is called. The following is an example of its use:
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.75\textwidth]{figures/spot_coord_demo}
-			\caption{An example-attempt to obtain the right angle and 
+			\caption{An attempt to obtain the right angle and 
 			coordinates to crop images for spot 19.}
 		\end{figure}
-		This tool was used to get cropping instructions for each spot. These instructions are stored in
-		\texttt{label\_examples/crop\_spots/crop\_instructions.csv}. They are 
-		accessed by
-		\texttt{label\_examples/crop\_spots/crop\_all\_spots.py}, which is itself called by
-		\texttt{label\_examples/crop\_spots/daily\_cropper.sh}. The latter is what the user has to call to automatically
-		crop all images placed in \texttt{label\_examples/pictures\_dump} into \texttt{label\_examples/pictures\_dump/cropped}.
-		The following is thus the cropping workflow:
+		\hspace*{-6mm}The following was thus the cropping workflow:
 		\begin{enumerate}
 			\item User places all images to be cropped in \texttt{label\_examples/pictures\_dump}, and calls
 			\texttt{label\_examples/crop\_spots/daily\_cropper.sh}. 
 			\item The script calls \texttt{label\_examples/crop\_spots/crop\_all\_spots.py}, which pipes
-			shell commands to obtain the cropped image of each spot from each image to be cropped to
+			shell commands to obtain the image of each spot from each image to 
+			be cropped to
 			\texttt{label\_examples/crop\_spots/todo.sh}. These shell commands are calls to
 			\texttt{label\_examples/crop\_spots/crop.py}, which crops and saves a specified spot from a
 			single image, given its cropping instructions.
@@ -310,10 +321,12 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\end{figure}
 
 	\subsection{Labeling of cropped images}
-		After cropping, the resulting images are to be transferred to\\
-		\texttt{label\_examples/label\_spots/pictures\_to\_label/} for labeling, 
+		After cropping, the resulting images are to be transferred to
+		\texttt{label\_examples/la-} \texttt{bel\_spots/pictures\_to\_label/} 
+		for labeling, 
 		which is done using 
-		\texttt{label\_examples/label\_spots/spot\_labeler.R}. This script displays
+		\texttt{label\_examp-} \texttt{les/label\_spots/spot\_labeler.R}. This 
+		script displays
 		each cropped image in sequence, prompting the user to type a label for each
 		one. In the case of this problem, labels were either ``0'' or ``1'',
 		depending on whether the spot was empty or occupied respectively. Once each
