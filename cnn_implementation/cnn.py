@@ -24,10 +24,10 @@ flags.DEFINE_integer('num_epochs',
 flags.DEFINE_float('learning_rate',
                    0.0001,
                    'Initial learning rate.')
-flags.DEFINE_string('relu',
+flags.DEFINE_string('activation',
                     'scaled',
-                    ('Type of ReLU to use: "vanilla", "scaled", "exp", "leaky"'
-                     ', "cap6", "softsign", "softplus"'))
+                    ('Type of activation function to use: "vanilla", "scaled",'
+                     ' "exp", "leaky", "cap6", "softsign", "softplus".'))
 flags.DEFINE_string('dropout_loc',
                     'before',
                     'Whether to apply dropout "before" or "after" pooling.')
@@ -125,22 +125,22 @@ biases['fc2'] = tf.get_variable('bfc2',
 
 
 def activate(X):
-    if FLAGS.relu == 'vanilla':
+    if FLAGS.activation == 'vanilla':
         return tf.nn.relu(X)
-    elif FLAGS.relu == 'scaled':
+    elif FLAGS.activation == 'scaled':
         return tf.nn.selu(X)
-    elif FLAGS.relu == 'exp':
+    elif FLAGS.activation == 'exp':
         return tf.nn.elu(X)
-    elif FLAGS.relu == 'leaky':
+    elif FLAGS.activation == 'leaky':
         return tf.nn.leaky_relu(X)
-    elif FLAGS.relu == 'cap6':
+    elif FLAGS.activation == 'cap6':
         return tf.nn.relu6(X)
-    elif FLAGS.relu == 'softsign':
+    elif FLAGS.activation == 'softsign':
         return tf.nn.softsign(X)
-    elif FLAGS.relu == 'softplus':
+    elif FLAGS.activation == 'softplus':
         return tf.nn.softplus(X)
     else:
-        raise ValueError(('ReLU choice not one of "vanilla", "scaled", "exp", '
+        raise ValueError(('Activation function choice not one of "vanilla", "scaled", "exp", '
                           '"leaky", "cap6", "softsign", "softplus".'))
 
 
@@ -221,7 +221,7 @@ def write_mistake(mistake_image, true_vs_predicted, curr_split_num, mistake_num)
     os.system('if [ ! -d "mistake_images" ]; then mkdir mistake_images; fi;')
     os.system(f'if [ ! -d "{base_path}" ]; then mkdir {base_path}; fi;')
     cv2.imwrite((f'{base_path}/{mistake_num}_t-{int(true_vs_predicted[0])}_'
-                f'p-{int(true_vs_predicted[1])}.jpg'),
+                 f'p-{int(true_vs_predicted[1])}.jpg'),
                 mistake_image)
 
 

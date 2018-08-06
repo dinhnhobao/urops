@@ -17,6 +17,11 @@ data/*
 */*/.RData
 */*/*/.RData
 
+.Rapp.history
+*/.Rapp.history
+*/*/.Rapp.history
+*/*/*/.Rapp.history
+
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 */*/.ipynb_checkpoints/
