@@ -213,20 +213,22 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\includegraphics[width=0.5\textwidth]{figures/spots_wo_labels.png}
 			\caption{facing the following parking lot.}
 		\end{figure}
+		\vskip -5mm
 		Pictures were taken every five minutes by a Raspberry Pi-based camera, as pictured below:
 		\vskip 5mm
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_1.jpg}
-			\caption{The Raspberry Pi and its memory and power supply were enclosed in the cooled box.}
-			\includegraphics[width=0.4\textwidth, angle=-90]{figures/rpi_camera_2.jpg}
-			\caption{The camera module was mounted firmly on the window at a suitable angle.}
-			\includegraphics[width=0.7\textwidth]{figures/rpi_camera_3.jpg}
-			\caption{Measures were taken to mitigate the risk of fire -- the vantage was lacked ventilation and 
-			encountered direct sunlight.}
+			\includegraphics[width=0.4\textwidth]{figures/rpi_camera_1.png}
+			\caption{The Raspberry Pi and its memory and power supply were 
+			enclosed in the cooled box.}
+			\vskip 5mm
+			\includegraphics[width=0.4\textwidth]{figures/rpi_camera_2.png}
+			\caption{The camera module was mounted firmly on the window at a 
+			suitable angle.}
 		\end{figure}
 		The following is a list of the complete apparatus used:
 		\begin{enumerate}
+			\setlength\itemsep{-3mm}
 			\item Raspberry Pi Model B+, running Raspbian 4.14.
 			\begin{itemize}
 				\item[] Power supply: 20000 mAh USB powerbank, enclosed in a LiPo battery blast protector.
@@ -264,7 +266,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		bounding boxes in the terminal from which the script is called. The following is an example of its use:
 		\begin{figure}[H]
 			\centering
-			%\includegraphics[width=0.75\textwidth\{figures/spot_coord_demo}
+			\includegraphics[width=0.75\textwidth]{figures/spot_coord_demo}
 			\caption{An example-attempt to obtain the right angle and coordinates to crop images for spot 18.}
 		\end{figure}
 		This tool was used to get cropping instructions for each spot. These instructions are stored in
@@ -288,8 +290,9 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		the otherwise tedious cropping process.
 		\begin{figure}[H]
 			\centering
-			%\includegraphics[width=0.75\textwidth]{figures/daily\_cropper\_example}
-			\caption{One call to \texttt{daily\_cropper.sh}, and all images are cropped.}
+			\includegraphics[width=0.8\textwidth]{figures/daily_cropper_example}
+			\caption{\texttt{daily\_cropper.sh} generates shell commands to 
+			crop all desired images.}
 		\end{figure}
 
 	\subsection{Labeling of cropped images}
@@ -302,26 +305,27 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		depending on whether the spot was empty or occupied respectively. Once each
 		image has been labelled, labels are written to a \texttt{.csv} file
 		entitled by the date the images were taken. The following is an example of
-		the labeling process:
+		the labeling process:\\
 		\begin{figure}[H]
 			\centering
-			%\includegraphcs[width=0.75\textwidth]{figures/spot\_labeler\_example}
+			\includegraphics[width=0.8\textwidth]{figures/spot_labeler_example}
 			\caption{The image of each spot is displayed in sequence.}
-		\end{figure}
-	
+		\end{figure}	
 	\subsection{Serialization of data}
 		After data collection, processing, and labeling was completed, the data was
 		ready to be serialized. Namely, all labels were stored in \texttt{data/labels/} and cropped
 		images in \texttt{data/cropped/}, \texttt{save\_dataset/serialize\_dataset.ipynb}
 		was used to process the images and labels into NumPy arrays before serialization
-		into \texttt{.hdf5} binary files.\\
+		into \texttt{.hdf5} binary files.
+		\newpage
 		The following is the process:
 		\begin{enumerate}
 			\item All cropped images and labels are used to create the feature and label matrices
 			(respetively).
 			\item These matrices are split up randomly into the train and test sets, with the test
 			set comprising of 10\% of the total number of examples at hand.
-			\item Mean-subtraction and normalization of the test set is conducted using the mean
+			\item Mean-subtraction and normalization of the test set is 
+			conducted using the mean \cite{sub-norm}\relax
 			and standard deviation of the training set. The test set is then saved as a
 			\texttt{.hdf5} binary file in \texttt{data/hdf5/} as \texttt{test\_set.hdf5}.
 			\item The training set matrix is then split into train and validations sets three times,
@@ -338,8 +342,9 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		scripts can also be applied to the general data-processing context.)
 		Also to note is that the third-part \texttt{h5py} module was used to serialize the data into
 		\texttt{.hdf5} files instead of the more commonly-used inbuilt \texttt{pickle} module since
-		the former module is far more memory-efficient for the serialization of numerical arrays.
-	
+		the former module is far more memory-efficient for the serialization of 
+		numerical arrays \cite{hdf5-performance}\relax.
+
 	\subsection{Culmination}
 		After the completion of the above, the dataset was ready to use for machine learning purposes. It
 		has been uploaded to Google Drive as \texttt{NUSLot}
@@ -348,9 +353,11 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\begin{enumerate}
 			\item \texttt{raw\_data} comprises of ``complete'' parking lot images, cropped images of
 			individual spots, and all label \texttt{.csv} files.
-			\item The folder \texttt{full\_dataset} comprises of serialized NumPy arrays representing
+			\item \texttt{full\_dataset} comprises of serialized NumPy arrays 
+			representing
 			training, validation, and testing sets created from all 50,000 examples. 
-			\item The folder \texttt{toy\_dataset}, is a 10\% simple random sample of the data of
+			\item \texttt{toy\_dataset}, is a 10\% simple random sample of the 
+			data of
 			\texttt{full\_dataset}.
 		\end{enumerate}
 
@@ -398,19 +405,37 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	\end{itemize}
 	This network, trained over 20 epochs, has a testing accuracy of 99.9\%, a specificity of about 1, and a
 	sensitivity of 0.998. As found in ST2288, CNNs are effective for this 
-	binary classification task.
+	binary classification task. talk about actual numbers then talk about 
+	occlusion -- use the confusion matrix.
 	Actually, bring up the occlusion problem here, and talk about specificity 
 	so good that occlusion was not an issue, and show a picture of an occluded 
 	spot here.
+	\begin{figure}
+		\centering
+		\includegraphics[width=2cm]{figures/nuslot_occlusion}
+		\caption{One of the many instances of occlusion that it was not 
+		bothered by}
+	\end{figure}
 
 	What is more significant is the implementation of this CNN is its 
 	extensibility; most readily-available implementations of CNNs tend to not 
-	be so (see ``these links''):
+	be so \footnote{Consider the canonical
+	\hyperlink{https://github.com/aymericdamien/TensorFlow-Examples}
+	{github.com/aymericdamien/TensorFlow-Examples} and 
+	\hyperlink{https://www.tensorflow.org/versions/r1.0/get\_started/mnist/pros}
+	{tensorflow.org/versions/r1.0/get\_started/mnist/pros}}:
 	\begin{enumerate}
 		\item Automatic data management:
 		\item Dynamic scaling of network depth:
-		\item Ability to write evaluation mistakes to disk:
+		\item Ability to write evaluation mistakes to disk: 
+		entitled\_24\_t-1\_p-0
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=2cm]{figures/mistake_example}
+			\caption{lalala}
+		\end{figure}
 		\item Seamless model saving and restoration options:
+		\item Dropout more options: \cite{dropout}\relax 
 	\end{enumerate}
 	Apart from these more novel features, it also contains the following 
 	functionality:
@@ -418,9 +443,31 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\item Integration with Tensorboard, a visualization suite for 
 		Tensorflow: Tensorboard dynamically shows things. Also say you can 
 		control summary frequency.
+		\begin{figure}[H]
+			\centering
+			\includegraphics[height=3cm]{figures/tb_acc_loss}
+			\caption{lalala}
+		\end{figure}
+		\begin{figure}[H]
+			\centering
+			\includegraphics[height=5cm]{figures/tb_graph_2}
+			\caption{lalala}
+		\end{figure}
+		\begin{figure}[H]
+			\centering
+			\includegraphics[height=5cm]{figures/tb_graph_1}
+			\caption{lalala}
+		\end{figure}
 		\item End-user encapsulation from adjustment of hyperparameters, 
-		activation function and choices:
+		activation function and choices: \cite{selu-motivation} \footnote{See 
+		\hyperlink{https://github.com/shaohua0116/Activation-Visualization-Histogram}
+			{github.com/shaohua0116/Activation-Visualization-Histogram}}
 		\item Enhanced evaluation metrics:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[height=5cm]{figures/floydhub_results_example}
+			\caption{lalala}
+		\end{figure}
 	\end{enumerate}
 	Thus, this user-friendly implementation of a CNN on Tensorflow is yet 
 	another 
@@ -451,11 +498,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	reliably connecting such a device can be challenging.  Moreover, the CNN will
 	need to be placed on the cloud, with a suitable interface to handle
 	communication between the camera(s) taking the picture upon user request, the
-	 model serving the prediction, and the user's mobile application. Amazon's
-	Amazon Web Services offers us tools to host CNNs on the cloud~\cite{aws}\relax.
-	They offer serverless services that can scale dynamically in capacity in
-	response to demand, and are only billed per user request. Our application
-	intends to harness such services in its back-end.  Nonetheless, increasing the
+	 model serving the prediction, and the user's mobile application.
+	  Nonetheless, increasing the
 	resolution of information available to those seeking a parking spot is not the
 	only implication of this project, especially given that NUS' parking lots are
 	organized appropriately for demand. Rather, we truly view this project as a
@@ -481,6 +525,11 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		Pedamonti, D. (2018). Comparison of non-linear activation functions for 
 		deep neural networks on MNIST classification task. Retrieved August 6, 
 		2018, from https://arxiv.org/abs/1804.02763v1 arXiv:1804.02763v1
+	\bibitem{dropout}
+		Srivastava, Nitish \& Hinton, Geoffrey \& Krizhevsky, Alex \& 
+		Sutskever, Ilya \& Salakhutdinov, Ruslan. (2014). Dropout: A Simple Way 
+		to Prevent Neural Networks from Overfitting. Journal of Machine 
+		Learning Research. 15. 1929-1958.
 \end{thebibliography}
 
 \end{document}
