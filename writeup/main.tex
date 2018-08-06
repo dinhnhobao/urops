@@ -150,16 +150,21 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	\begin{itemize}
 		\setlength\itemsep{-3mm}
 		\item[] (Learning rate: 0.001)
-		\item[] Input layer: reads in 32-by-32 color images of parking spots.
-		\item[] Convolutional layer 1: applies 32 5-by-5 filters, and then the 
+		\item[] \textbf{Input layer:} reads in 32-by-32 color images of parking 
+		spots.
+		\item[] \textbf{Convolutional layer 1:} applies 32 5-by-5 filters, and 
+		then the 
 		rectified exponential linear unit (ReLU) activation function.
-		\item[] Pooling layer 1: performs max pooling with a 2-by-2 filter.
-		\item[] Convolutional layer 2: applies 64 3-by-3 filters, and then the 
+		\item[] \textbf{Pooling layer 1:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Convolutional layer 2:} applies 64 3-by-3 filters, and 
+		then the 
 		ReLU activation function.
-		\item[] Pooling layer 2: performs max pooling with a 2-by-2 filter.
-		\item[] Fully-connected layer 1: comprises of 1,024 neurons.
-		\item[] Output layer: comprises of 2 neurons, representing the output 
-		vector.
+		\item[] \textbf{Pooling layer 2:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Fully-connected layer 1:} comprises of 1,024 neurons.
+		\item[] \textbf{Output layer:} comprises of 2 neurons, representing the 
+		output vector.
 		\vspace*{-4mm}
 		\begin{enumerate}
 			\setlength\itemsep{-3mm}
@@ -376,11 +381,11 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		of memory constraints: each split of the training set is 17.7 GB. Given 
 		that these scripts may be used to process other data, 
 		\texttt{save\_data/serialize\_data.ipynb} has been designed to be able 
-		to create a variable number of splits, and handle a variable number of 
+		to create a variable number of splits and handle a variable number of 
 		label classes and image types. (In fact, all aforementioned scripts can 
 		also 
-		be used for general data-processing, given minor configuration for the 
-		specific data at hand.) Also to note is that the third-part 
+		be used for general data-processing given minor adjustment for the 
+		specific data at hand.) Also to note is that the third-party
 		\texttt{h5py} module was used to serialize the data into HDF5 files 
 		instead of the more commonly-used inbuilt \texttt{pickle} module since 
 		the former is far more RAM-efficient in the serialization of 
@@ -394,7 +399,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		comprises of 
 		three directories:
 		\begin{enumerate}
-			\item \texttt{raw\_data} comprises of the complete parking lot 
+			\item \texttt{raw\_data} comprises of complete parking lot 
 			images, cropped images of individual spots, and all label CSV files.
 			\item \texttt{full\_dataset} comprises of serialized NumPy arrays 
 			representing
@@ -405,41 +410,57 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\end{enumerate}
 
 \section{Implementation of the CNN}
-	The CNN was implemented on TensorFlow version 1.9. It was created using 
-	this library's low-level API to
-	allow for greater extensibility and functionality, which will be described in this section. Firstly, however,
-	a description of the architecture and hyperparameters of the CNN used for this classification problem:
+	The CNN was implemented using TensorFlow version 1.9's low-level API to
+	allow for greater extensibility and functionality, which will be described 
+	in this section. Firstly, however, a description of the architecture and 
+	hyperparameters of the particular CNN used for this classification problem:
 	\begin{itemize}
 		\setlength\itemsep{-3mm}
 		\item[] (Learning rate: 0.0001)
-		\item[] Input layer: reads in 128-by-128 color images of parking spots.
-		\item[] Convolutional layer 1: applies 64 5-by-5 filters, and then the 
-		scaled exponential linear unit (SeLU) activation function.
-		\item[] Dropout is applied with a keep probability of 0.95.
-		\item[] Pooling layer 1: performs max pooling with a 2-by-2 filter.
-		\item[] Convolutional layer 2: applies 128 3-by-3 filters, and then the 
+		\item[] \textbf{Input layer:} reads in 128-by-128 color images of 
+		parking spots.
+		\item[] \textbf{Convolutional layer 1:} applies 64 5-by-5 filters, and 
+		then the 
+		scaled exponential linear unit (SeLU) activation function 
+		\footnote{Using SeLU was found to lead to the fastest-learning CNN, 
+		reiterating past results: \cite{selu-motivation}\relax.}.
+		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+		\item[] \textbf{Pooling layer 1:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Convolutional layer 2:} applies 128 3-by-3 filters, and 
+		then the 
 		SeLU activation function.
-		\item[] Dropout is applied with a keep probability of 0.95.
-		\item[] Pooling layer 2: performs max pooling with a 2-by-2 filter.
-		\item[] Convolutional layer 3: applies 256 3-by-3 filters, and then the 
+		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+		\item[] \textbf{Pooling layer 2:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Convolutional layer 3:} applies 256 3-by-3 filters, and 
+		then the 
 		SeLU activation function.
-		\item[] Dropout is applied with a keep probability of 0.95.
-		\item[] Pooling layer 3: performs max pooling with a 2-by-2 filter.
-		\item[] Convolutional layer 4: applies 512 3-by-3 filters, and then the 
+		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+		\item[] \textbf{Pooling layer 3:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Convolutional layer 4:} applies 512 3-by-3 filters, and 
+		then the 
 		SeLU activation function.
-		\item[] Dropout is applied with a keep probability of 0.95.
-		\item[] Pooling layer 4: performs max pooling with a 2-by-2 filter.
-		\item[] Convolutional layer 5: applies 1024 3-by-3 filters, and then 
+		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+		\item[] \textbf{Pooling layer 4:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Convolutional layer 5:} applies 1024 3-by-3 filters, 
+		and then 
 		the SeLU activation function.
-		\item[] Dropout is applied with a keep probability of 0.95.
-		\item[] Pooling layer 5: performs max pooling with a 2-by-2 filter.
-		\item[] Convolutional layer 6: applies 2048 1-by-1 filters, and then 
+		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+		\item[] \textbf{Pooling layer 5:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Convolutional layer 6:} applies 2048 1-by-1 filters, 
+		and then 
 		the SeLU activation function.
-		\item[] Dropout is applied with a keep probability of 0.95.
-		\item[] Pooling layer 6: performs max pooling with a 2-by-2 filter.
-		\item[] Fully-connected layer 1: comprises of 2048 neurons.
-		\item[] Dropout is applied with a keep probability of 0.90.
-		\item[] Output layer: comprises of 2 neurons, representing the output 
+		\item[] \textbf{Dropout} is applied with a keep probability of 0.95.
+		\item[] \textbf{Pooling layer 6:} performs max pooling with a 2-by-2 
+		filter.
+		\item[] \textbf{Fully-connected layer 1:} comprises of 2048 neurons.
+		\item[] \textbf{Dropout} is applied with a keep probability of 0.90.
+		\item[] \textbf{Output layer:} comprises of 2 neurons, representing the 
+		output 
 		vector.
 		\vspace*{-4mm}
 		\begin{enumerate}
@@ -464,7 +485,8 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		correctly classified as ``empty''.}
 	\end{figure}
 	These findings reiterate what was found in ST2288: CNNs are effective for 
-	this binary classification task. 
+	this binary classification task, likely due to the low intra-class 
+	variation and high inter-class variation between examples.
 
 	\hspace*{-6mm}What is more significant is the TensorFlow implementation of 
 	this CNN and its
