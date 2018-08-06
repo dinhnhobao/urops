@@ -85,7 +85,7 @@ learning_rate = FLAGS.learning_rate
 batch_size = 256
 num_hidden_layers = 6
 num_filters_per_layer = [num_channels, 64, 128, 256, 512, 1024, 2048]
-fc_layer_size = 2048
+fc1_layer_size = 2048
 filter_sizes = [None, 5, 3, 3, 3, 3, 1]
 pooling_kernel_sizes = [None, 2, 2, 2, 2, 2, 2]
 
@@ -105,10 +105,10 @@ for i in range(1, len(pooling_kernel_sizes)):
 weights['fc1'] = tf.get_variable('wfc1',
                                  shape=(final_size * final_size *
                                         num_filters_per_layer[num_hidden_layers],
-                                        fc_layer_size),
+                                        fc1_layer_size),
                                  initializer=tf.contrib.layers.xavier_initializer())
 weights['fc2'] = tf.get_variable('wfc2',
-                                 shape=(fc_layer_size, num_classes),
+                                 shape=(fc1_layer_size, num_classes),
                                  initializer=tf.contrib.layers.xavier_initializer())
 
 biases = dict()
@@ -117,7 +117,7 @@ for i in range(1, (num_hidden_layers + 1)):
                                      shape=(num_filters_per_layer[i]),
                                      initializer=tf.contrib.layers.xavier_initializer())
 biases['fc1'] = tf.get_variable('bfc1',
-                                shape=(fc_layer_size),
+                                shape=(fc1_layer_size),
                                 initializer=tf.contrib.layers.xavier_initializer()),
 biases['fc2'] = tf.get_variable('bfc2',
                                 shape=(num_classes),

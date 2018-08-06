@@ -287,7 +287,7 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\centering
 			%\includegraphics[width=0.75\textwidth]{figures/daily\_cropper\_example}
 			\caption{One call to \texttt{daily\_cropper.sh}, and all images are cropped.}
-		\end{figure}\\
+		\end{figure}
 
 	\subsection{Labeling of cropped images}
 		After cropping, the resulting images are to be transferred to\\
@@ -311,35 +311,97 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		ready to be serialized. Namely, all labels were stored in \texttt{data/labels/} and cropped
 		images in \texttt{data/cropped/}, \texttt{save\_dataset/serialize\_dataset.ipynb}
 		was used to process the images and labels into NumPy arrays before serialization
-		into \texttt{.hdf5} binary files.  
-
+		into \texttt{.hdf5} binary files.\\
 		The following is the process:
 		\begin{enumerate}
 			\item All cropped images and labels are used to create the feature and label matrices
 			(respetively).
 			\item These matrices are split up randomly into the train and test sets, with the test
-			set comprising of 10\% of the total number of examples at hand. The test set is then
-			saved as a \texttt{.hdf5} binary file in 
-		\end{enumerate}	
-
-		Talk in detail about the manner in which things are processed. There is quite a lot to say.
-
-Labels in ../data/labels/.
-(Cropped) pictures in ../data/cropped/.
-../data/hdf5/ created to store the serialized datasets.
-		
-mention
-		
-		Mention that this turned out to be far more efficient than the built-in, popular, pickle module.
-		Kept running out of memory.
-  
+			set comprising of 10\% of the total number of examples at hand.
+			\item Mean-subtraction and normalization of the test set is conducted using the mean
+			and standard deviation of the training set. The test set is then saved as a
+			\texttt{.hdf5} binary file in \texttt{data/hdf5/} as \texttt{test\_set.hdf5}.
+			\item The training set matrix is then split into train and validations sets three times,
+			to allow for stratified three-fold cross validation. For each split, the train and
+			validation sets are mean-subtracted and normalized using the mean of the corresponding
+			training set. Each split is then saved
+			\texttt{data/hdf5/train\_validation\_set\_{split\_number}.hdf5}, where
+			\texttt{split\_number} is one of 1, 2, or 3.
+		\end{enumerate}
+		Three splits were made instead of the more common five or ten because of memory constraints: each
+		split of the training set is 17.7 GB. Given that these scripts may be used to process other data,
+		\texttt{save\_data/serialize\_data.ipynb} has been designed to be able to create a variable number
+		of splits, and handle a variable number of classes and image types. (In fact, all aforementioned
+		scripts can also be applied to the general data-processing context.)
+		Also to note is that the third-part \texttt{h5py} module was used to serialize the data into
+		\texttt{.hdf5} files instead of the more commonly-used inbuilt \texttt{pickle} module since
+		the former module is far more memory-efficient for the serialization of numerical arrays.
+	
 	\subsection{Culmination}
-		Describe the dataset and where to get it and other practical matters.			
+		After the completion of the above, the dataset was ready to use for machine learning purposes. It
+		has been uploaded to Google Drive as \texttt{NUSLot}
+		\hyperlink{https://goo.gl/fV2NXS}{goo.gl/fV2NXS}, and comprises of 
+		three sub-directories:
+		\begin{enumerate}
+			\item \texttt{raw\_data} comprises of ``complete'' parking lot images, cropped images of
+			individual spots, and all label \texttt{.csv} files.
+			\item The folder \texttt{full\_dataset} comprises of serialized NumPy arrays representing
+			training, validation, and testing sets created from all 50,000 examples. 
+			\item The folder \texttt{toy\_dataset}, is a 10\% simple random sample of the data of
+			\texttt{full\_dataset}.
+		\end{enumerate}
 
+\section{Implementation of the CNN}
+	The CNN was implemented on Tensorflow version 1.9. It was created using this library's low-level API to
+	allow for greater extensibility and functionality, which will be described in this section. Firstly, however,
+	a description of the architecture and hyperparameters of the CNN used for this classification problem:
+	\begin{itemize}
+		\item[] (Learning rate: 0.0001)
+		\item[] Input layer: reads in 128-by-128 color images of parking spots.
+		\item[] Convolutional layer 1: applies 64 5-by-5 filters, and then the 
+		scaled exponential linear unit (SeLU) activation function.
+		\item[] Dropout is applied with a keep probability of 0.95.
+		\item[] Pooling layer 1: performs max pooling with a 2-by-2 filter.
+		\item[] Convolutional layer 2: applies 128 3-by-3 filters, and then the 
+		SeLU activation function.
+		\item[] Dropout is applied with a keep probability of 0.95.
+		\item[] Pooling layer 2: performs max pooling with a 2-by-2 filter.
+		\item[] Convolutional layer 3: applies 256 3-by-3 filters, and then the 
+		SeLU activation function.
+		\item[] Dropout is applied with a keep probability of 0.95.
+		\item[] Pooling layer 3: performs max pooling with a 2-by-2 filter.
+		\item[] Convolutional layer 4: applies 512 3-by-3 filters, and then the 
+		SeLU activation function.
+		\item[] Dropout is applied with a keep probability of 0.95.
+		\item[] Pooling layer 4: performs max pooling with a 2-by-2 filter.
+		\item[] Convolutional layer 5: applies 1024 3-by-3 filters, and then 
+		the SeLU activation function.
+		\item[] Dropout is applied with a keep probability of 0.95.
+		\item[] Pooling layer 5: performs max pooling with a 2-by-2 filter.
+		\item[] Convolutional layer 6: applies 2048 1-by-1 filters, and then 
+		the SeLU activation function.
+		\item Dropout is applied with a keep probability of 0.95.
+		\item[] Pooling layer 6: performs max pooling with a 2-by-2 filter.
+		\item[] Fully-connected layer 1: comprises of 2048 neurons.
+		\item[] Output layer: 2 neurons, representing the output vector.
+		\vspace*{-4mm}
+		\begin{enumerate}
+			\setlength\itemsep{-3mm}
+			\item[] (0, 1) $\rightarrow$ occupied spot
+			\item[] (1, 0) $\rightarrow$ empty spot
+		\end{enumerate}
+	\end{itemize}
+	This network, trained over 20 epochs, has a testing accuracy of 99.9\%, a specificity of about 1, and a
+	sensitivity of 0.998. As found in ST2288, CNNs are effective for this binary classification task.	
 
 \section{Conclusion and extensions}
 	Tell them your honest criticisms of it here, and how you learned that things
 	might not be suitable.
+	Also talk about how there is a standard way to learn about this stuff, but
+	not a standard way to go from learning to implementation, and that given your
+	experiences you hope that while what was found here was not ground breaking,
+	there is significant merit to this extensible thing and say exactly how it is
+	extensible.
 
 	The approach to the second objective, creation of the mobile application, is
 	dependent on the experiences from the first. Namely, the second objective will
@@ -347,7 +409,7 @@ mention
 	reliably connecting such a device can be challenging.  Moreover, the CNN will
 	need to be placed on the cloud, with a suitable interface to handle
 	communication between the camera(s) taking the picture upon user request, the
-	model serving the prediction, and the user's mobile application. Amazon's
+	 model serving the prediction, and the user's mobile application. Amazon's
 	Amazon Web Services offers us tools to host CNNs on the cloud~\cite{aws}\relax.
 	They offer serverless services that can scale dynamically in capacity in
 	response to demand, and are only billed per user request. Our application
