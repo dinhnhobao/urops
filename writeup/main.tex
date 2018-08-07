@@ -629,43 +629,25 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		problems.
 
 \section{Conclusion}
-	Also bring up the problem that realize that even with this vantage the 
-	trees stopped me from doing some spots. And if we are too low occlusion 
-	gets undeniably bad -- completely blocking.
-	This project was carried out with the intention to explore the practicality 
-	and effectiveness of the use of CNNs to ascertain the occupancy status a 
-	parking lot given pictures of it. Fortunately, performance on both an 
-	external and locally-sourced dataset was extremely good. However, and 
-	surprisingly, there are significant practical challenges to the setting-up 
-	of picture-taking hardware. Some of 
+	While CNNs are effective for this task, the data collection process 
+	revealed that this idea lacks practicality due to the difficulty of 
+	obtaining suitable images for classification. Namely, a high vantage was 
+	needed to shoot pictures of this small parking lot that minimized occlusion 
+	between spots; such a vantage likely does not exist or is not accessible 
+	for most lots. Moreover, even with such a high vantage, certain spots could 
+	not be used for classification due to the tree cover. The hardware itself 
+	suffered from high power consumption, and rendering it unsuitable for 
+	``hands-free'' operation. Lastly, only daytime pictures could be taken and 
+	classified -- most affordable cameras, including that of the Raspberry Pi, 
+	cannot take sufficiently-sharp images during nighttime for the purposes of 
+	classification.
 	
-	the intricacies and challenged involved in the process of 
-
-
-
-	Tell them your honest criticisms of it here, and how you learned that things
-	might not be suitable.
-	Also talk about how there is a standard way to learn about this stuff, but
-	not a standard way to go from learning to implementation, and that given your
-	experiences you hope that while what was found here was not ground breaking,
-	there is significant merit to this extensible thing and say exactly how it is
-	extensible.
-
-	The approach to the second objective, creation of the mobile application, is
-	dependent on the experiences from the first. Namely, the second objective will
-	require upgrade of the camera to one that is Internet-connected; powering and
-	reliably connecting such a device can be challenging.  Moreover, the CNN will
-	need to be placed on the cloud, with a suitable interface to handle
-	communication between the camera(s) taking the picture upon user request, the
-	 model serving the prediction, and the user's mobile application.
-	  Nonetheless, increasing the
-	resolution of information available to those seeking a parking spot is not the
-	only implication of this project, especially given that NUS' parking lots are
-	organized appropriately for demand. Rather, we truly view this project as a
-	capability-building exercise; a segue into greater problems that c n be
-	addressed by machine learning--either by us or those who take reference to our
-	experiences in the future.
-
+	\hspace*{-6mm}Nonetheless, this project served as an excellent 
+	capability-building exercise: it made explicit the challenges and workflow 
+	required to efficiently create a dataset and prepare it for modeling upon. 
+	I therefore hope that the output of this project informs those carrying out 
+	their own with practical lessons and provides them with a suite of tools 
+	easily modified to their own purposes.
 \newpage
 \begin{thebibliography}{unsrt}
 	\bibitem{pklot-paper}
