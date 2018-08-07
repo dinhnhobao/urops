@@ -1,4 +1,4 @@
-### Repository for the AY 17/18 UROPS on ascertaining the occupancy of a parking lot using convolutional neural networks.
+### Repository for the AY 17/18 UROPS: ascertaining the occupancy of a parking lot using convolutional neural networks.
 *Clone with `--depth 1` to avoid a large `.git` folder; required datasets can be found [here](https://drive.google.com/open?id=1_UIeomO1Pn8GsVkRkuybTSo_R3cvOh_-).*
 
 <p align="center"> 
