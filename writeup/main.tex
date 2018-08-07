@@ -514,55 +514,104 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		this CNN and its
 		extensibility; most readily-available implementations of CNNs tend to 
 		not 
-		be so\footnote{Consider the canonical
-		\hyperlink{https://github.com/aymericdamien/TensorFlow-Examples}
-		{github.com/aymericdamien/TensorFlow-Examples} and 
-		\hyperlink{https://www.tensorflow.org/versions/r1.0/get\_started/mnist/pros}
-		{tensorflow.org/versions/r1.0/get\_started/mnist/pros}}:
+		be so:
 		\begin{enumerate}
-			\item Automatic data management:
-			\item Dynamic scaling of network depth:
-			\item Ability to write evaluation mistakes to disk: 
-			entitled\_24\_t-1\_p-0
+			\item Automatic data management: the dataset to be used for 
+			training and evaluation -- \texttt{toy\_dataset}, 
+			\texttt{full\_dataset}, or some other -- is controlled via a flag 
+			in 
+			the function call. More significantly, the download of new datasets 
+			in the aforementioned HDF5 train/evaluation format can also be 
+			activated and automatically-managed by the implementation through 
+			specification of another flag\footnote{Guiding examples are 
+			provided in this project's GitHub to allow for quick setup of this 
+			data download option for any custom dataset}.
+			\item Dynamic scaling of network depth: most readily-available 
+			TensorFlow CNN implementations have a hard-coded architecture, and 
+			require a deep-dive into the code for changing the depth of the 
+			network\footnote{Consider the ``canonical''
+			\hyperlink{https://github.com/aymericdamien/TensorFlow-Examples}
+			{github.com/aymericdamien/TensorFlow-Examples} and 
+			\hyperlink{https://www.tensorflow.org/versions/r1.0/get\_started/mnist/pros}
+			{tensorflow.org/versions/r1.0/get\_started/mnist/pros}}. This 
+			implementation has been programmed in such a manner 
+			that only an integer representing the number of hidden layers (and 
+			lists corresponding to filter and max pooling kernel sizes) needs 
+			to be supplied for the creation of the CNN. This feature makes 
+			model selection far more convenient and less error-prone.
+			\item Ability to write evaluation mistakes to disk: statistics like 
+			loss and specificity only go so far in helping users gauge the 
+			performance of the network. It can often help to see the actual 
+			examples the model misclassifies for they may reveal systemic 
+			weaknesses in the model's ability. This implementation thus has the 
+			functionality to write misclassified examples to a directory in the 
+			format 
+			\texttt{\{spot\_id\}\_t-\{true\_label\}\_p-\{predicted\_label\}}. 
+			For 
+			example, the following example was written to disk as 
 			\begin{figure}[H]
 				\centering
 				\includegraphics[width=2cm]{figures/mistake_example}
 				\caption{One of the three examples falsely-classified as 
 				negative.}
 			\end{figure}
-			\item Seamless model saving and restoration options:
-			\item Dropout more options: \cite{dropout}\relax 
+			\item Seamless model saving and restoration options: this 
+			implementation can also store models created after a session of 
+			training, and then, given their file path, restore them in a new 
+			session. This allows for training to be split up across sessions. 
+			While this functionality was not essential for the training of CNNs 
+			on this dataset, such training schemes are often used when training 
+			on very large datasets of millions of examples.
+			\item Dropout more options: dropout is most commonly only applied 
+			after the first fully-connected layer, but there have also been 
+			benefits to applying dropout after convolution or after pooling 
+			\cite{dropout}\relax. Therefore, this implementation gives users 
+			the option to apply dropout in either way with the specification of 
+			one flag.
 		\end{enumerate}
 		Apart from these more novel features, it also contains the following 
 		functionality:
 		\begin{enumerate}
-			\item Integration with TensorBoard, a visualization suite for 
-			TensorFlow: TensorBoard dynamically shows things. Also say you can 
-			control summary frequency.
+			\item Encapsulation of hyperparameter tuning: the end-user needs 
+			only to specify the numerical values for the hyperparameters 
+			(learning rate, dropout keep probabilities, filter sizes, etc.); 
+			these choices' effect on the construction of the computational 
+			graph is automated. This allows for more convenient model tuning.
+			\item Basic integration with TensorBoard, a visualization suite for 
+			TensorFlow: TensorBoard plots the computational graph of the 
+			network for visualization and debugging purposes, and also 
+			dynamically displays the accuracy and loss of CNNs being trained. 
+			This allows for easy comparison of the different models.
 			\begin{figure}[H]
 				\centering
 				\includegraphics[height=5cm]{figures/tb_acc_loss}
 				\caption{Comparison of two runs: one with SeLU activation, and 
 				the other with leaky ReLU: the former leads to a slightly 
-				higher 
-				learning rate.}
+				higher learning rate.}
 			\end{figure}
 			\begin{figure}[H]
 				\centering
 				\includegraphics[height=3cm]{figures/tb_graph_1}
-				\caption{Graph of the first convolutional layer.}
+				\caption{TensorBoard graph of the first convolutional layer.}
 			\end{figure}
 			\begin{figure}[H]
 				\centering
-				\includegraphics[height=7.8cm]{figures/tb_graph_2}
+				\includegraphics[height=7cm]{figures/tb_graph_2}
 				\caption{The tail-end of the complete computational graph.}
 			\end{figure}
-			\item End-user encapsulation from adjustment of hyperparameters, 
-			activation function and choices: \cite{selu-motivation} 
-			\footnote{See 
-			\hyperlink{https://github.com/shaohua0116/Activation-Visualization-Histogram}
-				{github.com/shaohua0116/Activation-Visualization-Histogram}}
-			\item Enhanced evaluation metrics:
+			A possible extension to current TensorBoard integration would be to 
+			enable plotting of layer activations across training epochs in the 
+			manner of \cite{github-activations}. This would aid the comparison 
+			of activation functions.
+			\item Choice of several activation functions: users can choose 
+			between the ReLU, SeLU, exponential linear unit, leaky ReLU, cap-6 
+			ReLU, softsign, and softplus activation functions with the use of a 
+			flag.
+			\item Enhanced evaluation metrics: apart from displaying training 
+			loss and accuracies, this implementation also prints evaluation 
+			loss and accuracy, along with a generalized confusion matrix. If 
+			the number of classes in the dataset is two, the sensitivity and 
+			specificity of the model is also printed.
 			\begin{figure}[H]
 				\centering
 				\includegraphics[height=7cm]{figures/floydhub_results_example}
@@ -571,8 +620,13 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 				calculated across all three splits.}
 			\end{figure}
 		\end{enumerate}
-		Thus, this user-friendly implementation of a CNN on TensorFlow is yet 
-		another 
+		Given this implementation's exceptional functionality and versatility, 
+		and its holistic compatibility with the aforementioned ``farm to 
+		table'' data processing tools, I think the greatest contribution of 
+		this project is less the evaluation of the soundness of using CNNs to 
+		ascertain parking lot occupancy, and more the creation of open-source 
+		tools that can very easily be modified to solve other machine learning 
+		problems.
 
 \section{Conclusion}
 	Also bring up the problem that realize that even with this vantage the 
@@ -630,6 +684,11 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		Pedamonti, D. (2018). Comparison of non-linear activation functions for 
 		deep neural networks on MNIST classification task. Retrieved August 6, 
 		2018, from https://arxiv.org/abs/1804.02763v1 arXiv:1804.02763v1
+	\bibitem{github-activations}
+		S. (n.d.). Activation-Visualization-Histogram. Retrieved August 7, 
+		2018, from 
+		https://github.com/shaohua0116/Activation-Visualization-Histogram 
+		Repository on GitHub.
 	\bibitem{dropout}
 		Srivastava, Nitish \& Hinton, Geoffrey \& Krizhevsky, Alex \& 
 		Sutskever, Ilya \& Salakhutdinov, Ruslan. (2014). Dropout: A Simple Way 

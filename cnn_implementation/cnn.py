@@ -26,8 +26,9 @@ flags.DEFINE_float('learning_rate',
                    'Initial learning rate.')
 flags.DEFINE_string('activation',
                     'scaled',
-                    ('Type of activation function to use: "vanilla", "scaled",'
-                     ' "exp", "leaky", "cap6", "softsign", "softplus".'))
+                    ('Type of activation function to use: "rectified", '
+                     '"scaled", "exp", "leaky", "cap6", "softsign", '
+                     '"softplus".'))
 flags.DEFINE_string('dropout_loc',
                     'before',
                     'Whether to apply dropout "before" or "after" pooling.')
@@ -125,7 +126,8 @@ biases['fc2'] = tf.get_variable('bfc2',
 
 
 def activate(X):
-    if FLAGS.activation == 'vanilla':
+    """Applies the activation function of choicce to the feature array."""
+    if FLAGS.activation == 'rectified':
         return tf.nn.relu(X)
     elif FLAGS.activation == 'scaled':
         return tf.nn.selu(X)
@@ -140,12 +142,13 @@ def activate(X):
     elif FLAGS.activation == 'softplus':
         return tf.nn.softplus(X)
     else:
-        raise ValueError(('Activation function choice not one of "vanilla", "scaled", "exp", '
-                          '"leaky", "cap6", "softsign", "softplus".'))
+        raise ValueError(('Activation function choice not one of "rectified", '
+                          '"scaled", "exp", "leaky", "cap6", "softsign", '
+                          '"softplus".'))
 
 
 def convolute(X, W, b, stride=1):
-    '''tf.nn.convolute() wrapper, with bias and relu activation.'''
+    """tf.nn.convolute() wrapper, with bias and activation."""
     # The first and last element of 'strides' is example and
     # channel stride respectively.
     X = tf.nn.conv2d(X, W,
@@ -158,6 +161,7 @@ def convolute(X, W, b, stride=1):
 
 
 def apply_max_pooling(X, kernel_size=2):
+    """Applies max pooling to feature array."""
     # Stride of the kernel is always >= its size to prevent
     # overlap of pooling region.
     X = tf.nn.max_pool(X,
@@ -170,6 +174,8 @@ def apply_max_pooling(X, kernel_size=2):
 
 
 def get_fc1_layer(conv_layer):
+    """Applies the weights and biases to the input feature array before
+    dropout."""
     flat_conv_layer = tf.reshape(conv_layer,
                                  [-1,
                                   weights['fc1'].get_shape().as_list()[0]])
@@ -180,12 +186,16 @@ def get_fc1_layer(conv_layer):
 
 
 def get_predicted_labels(fc1_layer):
+    """Carries out softmax regression and then dropout to the given feature
+    array."""
     return tf.add(tf.matmul(fc1_layer,
                             weights['fc2']),
                   biases['fc2'])
 
 
 def apply_cnn(X, weights, biases):
+    """Runs the feature array through the complete CNN, ultimately returning
+    the predicted labels."""
     conv_layer = X
     for i in range(1, (num_hidden_layers + 1)):
         conv_layer = convolute(conv_layer,
