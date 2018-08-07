@@ -2,7 +2,7 @@
 *Clone with `--depth 1` to avoid a large `.git` folder; required datasets can be found [here](https://drive.google.com/open?id=1_UIeomO1Pn8GsVkRkuybTSo_R3cvOh_-).*
 
 <p align="center"> 
-<img src="https://ibb.co/nET86K">
+<img src="https://image.ibb.co/fveFmK/cover_image.jpg">
 </p>
 
 Refer to `writeup/main.tex` for the context behind and the usage of this repository.
