@@ -412,10 +412,10 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 \section{Implementation of the CNN}
 	The CNN was implemented using TensorFlow version 1.9's low-level API to
 	allow for greater extensibility and functionality, which will be described 
-	later in this section. Firstly, however, a description of the architecture 
-	and 
-	hyperparameters of the particular CNN used for this classification problem.
+	later in this section. Firstly, however, a description of the particular 
+	CNN used for this classification problem.
 	\subsection{Performance on \textit{NUSLot}}
+	Architecture:
 		\begin{itemize}
 			\setlength\itemsep{-3mm}
 			\item[] (Learning rate: 0.0001)
@@ -495,99 +495,103 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 		\hspace*{-6mm}where the element at (0, 1), for example, represents the 
 		number of 
 		false 
-		positives. It is heartening to note that network ``learned around`` the 
-		large number of instances of occlusion in this dataset:
+		positives. Given that there is only one such prediction, it is 
+		heartening to note that the network learned to correctly classify the 
+		large number of examples with occlusion in this dataset:
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=2cm]{figures/nuslot_occlusion}
 			\caption{One of the many instances of occlusion that the network 
 			correctly classified as ``empty''.}
 		\end{figure}
-		\hspace*{-6mm}These findings reiterate what was found in ST2288: CNNs 
+		\hspace*{-6mm}These findings reiterate the conclusion of ST2288: CNNs 
 		are 
 		effective for 
 		this binary classification task, likely due to the low intra-class 
 		and high inter-class variation between examples.
 	\subsection{Functionalities of this implementation}
-		What is more significant is the TensorFlow implementation 
+		What is perhaps more significant than this performance is the 
+		TensorFlow implementation 
 		of 
 		this CNN and its
 		extensibility; most readily-available implementations of CNNs tend to 
-		not 
-		be so:
+		not be so. The following are some of its more novel features:
 		\begin{enumerate}
 			\item Automatic data management: the dataset to be used for 
 			training and evaluation -- \texttt{toy\_dataset}, 
 			\texttt{full\_dataset}, or some other -- is controlled via a flag 
 			in 
-			the function call. More significantly, the download of new datasets 
+			the function call. Moreover, the download and use of new datasets 
 			in the aforementioned HDF5 train/evaluation format can also be 
-			activated and automatically-managed by the implementation through 
+			activated and managed by the implementation through 
 			specification of another flag\footnote{Guiding examples are 
-			provided in this project's GitHub to allow for quick setup of this 
-			data download option for any custom dataset}.
+			provided in this project's GitHub repository to allow for quick 
+			setup of this 
+			data download option for any custom dataset.}.
 			\item Dynamic scaling of network depth: most readily-available 
 			TensorFlow CNN implementations have a hard-coded architecture, and 
-			require a deep-dive into the code for changing the depth of the 
-			network\footnote{Consider the ``canonical''
+			require a deep-dive into the code for changing network 
+			depth\footnote{Consider the ``canonical''
 			\hyperlink{https://github.com/aymericdamien/TensorFlow-Examples}
 			{github.com/aymericdamien/TensorFlow-Examples} and 
 			\hyperlink{https://www.tensorflow.org/versions/r1.0/get\_started/mnist/pros}
 			{tensorflow.org/versions/r1.0/get\_started/mnist/pros}}. This 
 			implementation has been programmed in such a manner 
-			that only an integer representing the number of hidden layers (and 
-			lists corresponding to filter and max pooling kernel sizes) needs 
+			that only an integer representing the number of hidden layers and 
+			lists corresponding to filter details need
 			to be supplied for the creation of the CNN. This feature makes 
-			model selection far more convenient and less error-prone.
+			model alteration far more convenient and less error-prone.
 			\item Ability to write evaluation mistakes to disk: statistics like 
 			loss and specificity only go so far in helping users gauge the 
-			performance of the network. It can often help to see the actual 
-			examples the model misclassifies for they may reveal systemic 
-			weaknesses in the model's ability. This implementation thus has the 
-			functionality to write misclassified examples to a directory in the 
-			format 
-			\texttt{\{spot\_id\}\_t-\{true\_label\}\_p-\{predicted\_label\}}. 
-			For 
-			example, the following example was written to disk as 
+			performance of their network. It can often help to see the actual 
+			misclassified examples: they may reveal systemic weaknesses in the 
+			model's ability. This implementation thus has the functionality to 
+			write misclassified examples to a directory in the format 
+			\texttt{\{spot\_ID\}\_t-\{true\_label\}\_p-\{predicted\_label\}}.
+			For example, the following example was written to disk as
+			\texttt{24\_t-1\_p-0.jpg}.
 			\begin{figure}[H]
 				\centering
 				\includegraphics[width=2cm]{figures/mistake_example}
-				\caption{One of the three examples falsely-classified as 
-				negative.}
+				\caption{One of the three examples falsely classified as
+				``empty''.}
 			\end{figure}
 			\item Seamless model saving and restoration options: this 
-			implementation can also store models created after a session of 
+			implementation can also save models created after a session of 
 			training, and then, given their file path, restore them in a new 
-			session. This allows for training to be split up across sessions. 
+			session. This allows for training to be split across sessions. 
 			While this functionality was not essential for the training of CNNs 
 			on this dataset, such training schemes are often used when training 
-			on very large datasets of millions of examples.
-			\item Dropout more options: dropout is most commonly only applied 
-			after the first fully-connected layer, but there have also been 
+			on very large datasets with millions of examples.
+			\item More options for dropout application: dropout is most 
+			commonly 
+			only applied 
+			after the first fully-connected layer, but there can also be
 			benefits to applying dropout after convolution or after pooling 
 			\cite{dropout}\relax. Therefore, this implementation gives users 
 			the option to apply dropout in either way with the specification of 
 			one flag.
 		\end{enumerate}
-		Apart from these more novel features, it also contains the following 
-		functionality:
+		Apart from these more novel features, this implementation also has the 
+		following functionalities:
 		\begin{enumerate}
-			\item Encapsulation of hyperparameter tuning: the end-user needs 
-			only to specify the numerical values for the hyperparameters 
-			(learning rate, dropout keep probabilities, filter sizes, etc.); 
-			these choices' effect on the construction of the computational 
+			\item Encapsulated hyperparameter tuning: the end-user needs 
+			only to specify the numerical values for the model's 
+			hyperparameters;
+			application of these choices to the construction of the 
+			computational 
 			graph is automated. This allows for more convenient model tuning.
 			\item Basic integration with TensorBoard, a visualization suite for 
 			TensorFlow: TensorBoard plots the computational graph of the 
 			network for visualization and debugging purposes, and also 
-			dynamically displays the accuracy and loss of CNNs being trained. 
-			This allows for easy comparison of the different models.
+			displays the accuracy and loss of CNNs being trained in real-time.
+			This allows for easy comparison of different models.
 			\begin{figure}[H]
 				\centering
 				\includegraphics[height=5cm]{figures/tb_acc_loss}
-				\caption{Comparison of two runs: one with SeLU activation, and 
-				the other with leaky ReLU: the former leads to a slightly 
-				higher learning rate.}
+				\caption{Accuracy (top) and loss (bottom) comparison of two 
+				runs: blue with ReLU activation, and red with exponential 
+				linear unit (eLU).}
 			\end{figure}
 			\begin{figure}[H]
 				\centering
@@ -601,53 +605,58 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 			\end{figure}
 			A possible extension to current TensorBoard integration would be to 
 			enable plotting of layer activations across training epochs in the 
-			manner of \cite{github-activations}. This would aid the comparison 
+			manner of \cite{github-activations}. This would aid in the 
+			comparison 
 			of activation functions.
 			\item Choice of several activation functions: users can choose 
-			between the ReLU, SeLU, exponential linear unit, leaky ReLU, cap-6 
-			ReLU, softsign, and softplus activation functions with the use of a 
+			between the ReLU, SeLU, eLU, leaky ReLU, cap-6 
+			ReLU, softsign, and softplus activation functions with the use of 
+			just a 
 			flag.
 			\item Enhanced evaluation metrics: apart from displaying training 
-			loss and accuracies, this implementation also prints evaluation 
+			loss and accuracy, this implementation also prints evaluation 
 			loss and accuracy, along with a generalized confusion matrix. If 
 			the number of classes in the dataset is two, the sensitivity and 
 			specificity of the model is also printed.
 			\begin{figure}[H]
 				\centering
 				\includegraphics[height=7cm]{figures/floydhub_results_example}
-				\caption{Truncated display of training metrics at the end of 
+				\caption{Truncated display of performance metrics at the end of 
 				training and validation, with final validation accuracy 
 				calculated across all three splits.}
 			\end{figure}
 		\end{enumerate}
 		Given this implementation's exceptional functionality and versatility, 
 		and its holistic compatibility with the aforementioned ``farm to 
-		table'' data processing tools, I think the greatest contribution of 
-		this project is less the evaluation of the soundness of using CNNs to 
-		ascertain parking lot occupancy, and more the creation of open-source 
-		tools that can very easily be modified to solve other machine learning 
-		problems.
+		table'' data processing tools, the most significant contribution of 
+		this project may be less the evaluation of the soundness of using CNNs 
+		to ascertain parking lot occupancy and more the creation of 
+		open-source tools that can very easily be modified to solve other 
+		machine learning problems.
 
 \section{Conclusion}
-	While CNNs are effective for this task, the data collection process 
-	revealed that this idea lacks practicality due to the difficulty of 
+	While CNNs are effective for ascertaining occupancy, the data collection 
+	process 
+	revealed that this idea is impractical due to the difficulty of 
 	obtaining suitable images for classification. Namely, a high vantage was 
-	needed to shoot pictures of this small parking lot that minimized occlusion 
-	between spots; such a vantage likely does not exist or is not accessible 
+	needed to shoot pictures of this small parking lot to minimize occlusion; 
+	such a vantage likely does not exist or is not accessible 
 	for most lots. Moreover, even with such a high vantage, certain spots could 
-	not be used for classification due to the tree cover. The hardware itself 
-	suffered from high power consumption, and rendering it unsuitable for 
-	``hands-free'' operation. Lastly, only daytime pictures could be taken and 
-	classified -- most affordable cameras, including that of the Raspberry Pi, 
-	cannot take sufficiently-sharp images during nighttime for the purposes of 
-	classification.
+	not be used in classification due to tree cover. The hardware itself 
+	had high power consumption due to its operating environment, rendering it 
+	unsuitable for ``hands-free'' operation. Lastly, only daytime pictures 
+	could be taken and classified -- most affordable cameras, including that of 
+	the Raspberry Pi, cannot take sufficiently sharp images during nighttime 
+	for the purposes of classification. In-ground sensors may be more favorable 
+	for this task.
 	
 	\hspace*{-6mm}Nonetheless, this project served as an excellent 
-	capability-building exercise: it made explicit the challenges and workflow 
+	capability-building exercise: it made explicit the challenges to overcome 
+	and workflow 
 	required to efficiently create a dataset and prepare it for modeling upon. 
-	I therefore hope that the output of this project informs those carrying out 
-	their own with practical lessons and provides them with a suite of tools 
-	easily modified to their own purposes.
+	I therefore hope that the culmination of this project informs those 
+	carrying out their own with practical lessons, and provides them with a 
+	suite of tools easily modified to their own purposes.
 \newpage
 \begin{thebibliography}{unsrt}
 	\bibitem{pklot-paper}
@@ -669,13 +678,13 @@ Applying machine learning techniques to determine the occupancy of parking lots}
 	\bibitem{github-activations}
 		S. (n.d.). Activation-Visualization-Histogram. Retrieved August 7, 
 		2018, from 
-		https://github.com/shaohua0116/Activation-Visualization-Histogram 
+		https://github.com/shaohua0116/Activation-Visualization-Histogram.
 		Repository on GitHub.
 	\bibitem{dropout}
 		Srivastava, Nitish \& Hinton, Geoffrey \& Krizhevsky, Alex \& 
 		Sutskever, Ilya \& Salakhutdinov, Ruslan. (2014). Dropout: A Simple Way 
-		to Prevent Neural Networks from Overfitting. Journal of Machine 
-		Learning Research. 15. 1929-1958.
+		to Prevent Neural Networks from Overfitting. \textit{Journal of Machine 
+		Learning Research}. 15. 1929-1958.
 \end{thebibliography}
 
 \end{document}
